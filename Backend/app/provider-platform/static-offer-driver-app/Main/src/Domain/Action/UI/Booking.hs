@@ -141,7 +141,15 @@ bookingCancel bookingId admin = do
           }
 
 getRideInfo ::
-  (EncFlow m r, CacheFlow m r, EsqDBFlow m r, EsqDBReplicaFlow m r, CoreMetrics m) => Id SRB.Booking -> Id SP.Person -> m GetRideInfoRes
+  ( EncFlow m r,
+    CacheFlow m r,
+    EsqDBFlow m r,
+    EsqDBReplicaFlow m r,
+    CoreMetrics m
+  ) =>
+  Id SRB.Booking ->
+  Id SP.Person ->
+  m GetRideInfoRes
 getRideInfo bookingId personId = do
   mbNotification <- Esq.runInReplica $ QNotificationStatus.findActiveNotificationByDriverId driverId bookingId
   case mbNotification of

@@ -121,6 +121,7 @@ instance loggableAction :: Loggable Action where
     ActiveRideAPIResponseAction resp -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_screen" "active_ride_api_response"
     RecenterButtonAction -> trackAppActionClick appId (getScreen HOME_SCREEN) "in_screen" "recenter_btn"
     NoAction -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_screen" "no_action"
+    GoToNotificationScreen -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_screen" "go_to_notification_screen"
 
 
 
@@ -137,7 +138,7 @@ data ScreenOutput =   Refresh ST.HomeScreenState
                     | FcmNotification String ST.HomeScreenState
                     | NotifyDriverArrived ST.HomeScreenState
                     | UpdateStage ST.HomeScreenStage ST.HomeScreenState
-                    | GoToNotifications
+                    | GoToNotifications ST.HomeScreenState 
 
 data Action = NoAction
             | BackPressed
@@ -165,10 +166,13 @@ data Action = NoAction
             | StatsModelAction StatsModelController.Action
             | RideActiveAction RidesInfo
             | RecenterButtonAction
+            | GoToNotificationScreen
 
 eval :: Action -> ST.HomeScreenState -> Eval Action ScreenOutput ST.HomeScreenState
-eval AfterRender state = do 
-  continue state{props{mapRendered= true}}
+eval GoToNotificationScreen state = do
+  exit $ GoToNotifications state
+eval AfterRender state = do
+    continue state{props{mapRendered= true}}
 eval BackPressed state = do
   if state.props.enterOtpModal then do
     continue state { props = state.props { rideOtp = "", enterOtpFocusIndex = 0, enterOtpModal = false, rideActionModal = true } }
@@ -219,7 +223,7 @@ eval (BottomNavBarAction (BottomNavBar.OnNavigate item)) state = do
     "Alert" -> do 
       _ <- pure $ setValueToLocalNativeStore ALERT_RECEIVED "false"
       _ <- pure $ firebaseLogEvent "ny_driver_alert_click"
-      exit $ GoToNotifications
+      exit $ GoToNotifications state
     "Contest" -> do
       _ <- pure $ setValueToLocalNativeStore REFERRAL_ACTIVATED "false"
       exit $ GoToReferralScreen

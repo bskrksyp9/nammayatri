@@ -26,7 +26,7 @@ import Components.RideActionModal as RideActionModal
 import Components.StatsModel as StatsModel
 import Data.Array as DA
 import Data.Either (Either(..))
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe, isJust)
 import Data.String as DS
 import Data.Time.Duration (Milliseconds(..))
 import Debug.Trace (spy)
@@ -74,55 +74,59 @@ screen initialState =
           _ <- pure $ printLog "initial State" initialState
           _ <- HU.storeCallBackForNotification push Notification 
           _ <- HU.storeCallBackTime push TimeUpdate
-          if getValueToLocalNativeStore IS_RIDE_ACTIVE == "true" && initialState.data.activeRide.status == NOTHING then do
-            launchAff_ $ EHC.flowRunner $ runExceptT $ runBackT $ do
-              (GetRidesHistoryResp activeRideResponse) <- Remote.getRideHistoryReqBT "1" "0" "true"
-              case (activeRideResponse.list DA.!! 0) of 
-                Just ride -> lift $ lift $ doAff do liftEffect $ push $ RideActiveAction ride
-                Nothing -> setValueToLocalStore IS_RIDE_ACTIVE "false"
-              else pure unit
-          
-          case (getValueToLocalNativeStore LOCAL_STAGE) of 
-            "RideRequested"  -> do 
-                                if (getValueToLocalStore RIDE_STATUS_POLLING) == "False" then do
-                                  _ <- pure $ setValueToLocalStore RIDE_STATUS_POLLING_ID (HU.generateUniqueId unit)
-                                  _ <- pure $ setValueToLocalStore RIDE_STATUS_POLLING "True"
-                                  let secondsOver = if EHC.getExpiryTime (getValueToLocalNativeStore RIDE_REQUEST_TIME) true >= (rideRequestPollingData.duration) then (rideRequestPollingData.duration) else EHC.getExpiryTime (getValueToLocalNativeStore RIDE_REQUEST_TIME) true
-                                      counts = ceil $ (toNumber (rideRequestPollingData.duration - secondsOver) * 1000.0)/rideRequestPollingData.delay
-                                  if counts > 0 then launchAff_ $ EHC.flowRunner $ rideRequestPolling (getValueToLocalStore RIDE_STATUS_POLLING_ID) counts rideRequestPollingData.delay initialState push Notification
-                                    else void $ pure $ setValueToLocalStore RIDE_STATUS_POLLING "False"
-                                  pure unit
-                                  else pure unit  
-            "RideAccepted"   -> do 
-                                _ <- pure $ setValueToLocalStore RIDE_G_FREQUENCY "2000"
-                                _ <- pure $ setValueToLocalStore DRIVER_MIN_DISPLACEMENT "8.0"
-                                if (not initialState.props.routeVisible) && initialState.props.mapRendered then do 
-                                  _ <- JB.getCurrentPosition push $ ModifyRoute
-                                  _ <- JB.removeMarker "ny_ic_auto" -- TODO : remove if we dont require "ic_auto" icon on homescreen
+          if isJust initialState.props.selectedNotification then do
+            push GoToNotificationScreen
+            pure $ pure unit
+          else do
+            if getValueToLocalNativeStore IS_RIDE_ACTIVE == "true" && initialState.data.activeRide.status == NOTHING then do
+              launchAff_ $ EHC.flowRunner $ runExceptT $ runBackT $ do
+                (GetRidesHistoryResp activeRideResponse) <- Remote.getRideHistoryReqBT "1" "0" "true"
+                case (activeRideResponse.list DA.!! 0) of 
+                  Just ride -> lift $ lift $ doAff do liftEffect $ push $ RideActiveAction ride
+                  Nothing -> setValueToLocalStore IS_RIDE_ACTIVE "false"
+                else pure unit
+
+            case (getValueToLocalNativeStore LOCAL_STAGE) of 
+              "RideRequested"  -> do 
+                                  if (getValueToLocalStore RIDE_STATUS_POLLING) == "False" then do
+                                    _ <- pure $ setValueToLocalStore RIDE_STATUS_POLLING_ID (HU.generateUniqueId unit)
+                                    _ <- pure $ setValueToLocalStore RIDE_STATUS_POLLING "True"
+                                    let secondsOver = if EHC.getExpiryTime (getValueToLocalNativeStore RIDE_REQUEST_TIME) true >= (rideRequestPollingData.duration) then (rideRequestPollingData.duration) else EHC.getExpiryTime (getValueToLocalNativeStore RIDE_REQUEST_TIME) true
+                                        counts = ceil $ (toNumber (rideRequestPollingData.duration - secondsOver) * 1000.0)/rideRequestPollingData.delay
+                                    if counts > 0 then launchAff_ $ EHC.flowRunner $ rideRequestPolling (getValueToLocalStore RIDE_STATUS_POLLING_ID) counts rideRequestPollingData.delay initialState push Notification
+                                      else void $ pure $ setValueToLocalStore RIDE_STATUS_POLLING "False"
+                                    pure unit
+                                    else pure unit  
+              "RideAccepted"   -> do 
+                                  _ <- pure $ setValueToLocalStore RIDE_G_FREQUENCY "2000"
+                                  _ <- pure $ setValueToLocalStore DRIVER_MIN_DISPLACEMENT "8.0"
+                                  if (not initialState.props.routeVisible) && initialState.props.mapRendered then do 
+                                    _ <- JB.getCurrentPosition push $ ModifyRoute
+                                    _ <- JB.removeMarker "ny_ic_auto" -- TODO : remove if we dont require "ic_auto" icon on homescreen
+                                    pure unit 
+                                    else pure unit 
+                                  if (getValueToLocalStore RIDE_STATUS_POLLING) == "False" then do
+                                    _ <- pure $ setValueToLocalStore RIDE_STATUS_POLLING_ID (HU.generateUniqueId unit)
+                                    _ <- pure $ setValueToLocalStore RIDE_STATUS_POLLING "True"
+                                    launchAff_ $ EHC.flowRunner $ rideStatusPolling (getValueToLocalStore RIDE_STATUS_POLLING_ID) 20000.0 initialState push Notification
+                                    pure unit 
+                                    else pure unit 
+              "RideStarted"    -> do 
+                                  _ <- pure $ setValueToLocalStore RIDE_G_FREQUENCY "50000"
+                                  _ <- pure $ setValueToLocalStore DRIVER_MIN_DISPLACEMENT "25.0"
+                                  if (not initialState.props.routeVisible) && initialState.props.mapRendered then do 
+                                    _ <- JB.getCurrentPosition push $ ModifyRoute
+                                    _ <- JB.removeMarker "ny_ic_auto" -- TODO : remove if we dont require "ic_auto" icon on homescreen
+                                    pure unit 
+                                    else pure unit 
+              _                -> do 
+                                  _ <- pure $ setValueToLocalStore RIDE_G_FREQUENCY "50000"
+                                  _ <- pure $ setValueToLocalStore DRIVER_MIN_DISPLACEMENT "25.0"
+                                  _ <- JB.reallocateMapFragment (EHC.getNewIDWithTag "DriverTrackingHomeScreenMap")
+                                  _ <- checkPermissionAndUpdateDriverMarker initialState
+                                  _ <- launchAff_ $ EHC.flowRunner $ checkCurrentRide push Notification
                                   pure unit 
-                                  else pure unit 
-                                if (getValueToLocalStore RIDE_STATUS_POLLING) == "False" then do
-                                  _ <- pure $ setValueToLocalStore RIDE_STATUS_POLLING_ID (HU.generateUniqueId unit)
-                                  _ <- pure $ setValueToLocalStore RIDE_STATUS_POLLING "True"
-                                  launchAff_ $ EHC.flowRunner $ rideStatusPolling (getValueToLocalStore RIDE_STATUS_POLLING_ID) 20000.0 initialState push Notification
-                                  pure unit 
-                                  else pure unit 
-            "RideStarted"    -> do 
-                                _ <- pure $ setValueToLocalStore RIDE_G_FREQUENCY "50000"
-                                _ <- pure $ setValueToLocalStore DRIVER_MIN_DISPLACEMENT "25.0"
-                                if (not initialState.props.routeVisible) && initialState.props.mapRendered then do 
-                                  _ <- JB.getCurrentPosition push $ ModifyRoute
-                                  _ <- JB.removeMarker "ny_ic_auto" -- TODO : remove if we dont require "ic_auto" icon on homescreen
-                                  pure unit 
-                                  else pure unit 
-            _                -> do 
-                                _ <- pure $ setValueToLocalStore RIDE_G_FREQUENCY "50000"
-                                _ <- pure $ setValueToLocalStore DRIVER_MIN_DISPLACEMENT "25.0"
-                                _ <- JB.reallocateMapFragment (EHC.getNewIDWithTag "DriverTrackingHomeScreenMap")
-                                _ <- checkPermissionAndUpdateDriverMarker initialState
-                                _ <- launchAff_ $ EHC.flowRunner $ checkCurrentRide push Notification
-                                pure unit 
-          pure $ pure unit
+            pure $ pure unit
         )
   ]
   , eval : (\state  action -> do

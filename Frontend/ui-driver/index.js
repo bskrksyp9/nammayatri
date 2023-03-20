@@ -7,6 +7,11 @@ window.session_id = guid();
 window.version = __VERSION__;
 console.warn("Hello World");
 
+let eventObject = {
+    type : ""
+  , data : ""
+}
+
 var jpConsumingBackpress = {
   event: "jp_consuming_backpress",
   payload: { jp_consuming_backpress: true }
@@ -104,7 +109,9 @@ window.onMerchantEvent = function (event, payload) {
     window.__payload.sdkVersion = "2.0.1"
     console.warn("Process called");
     var parsedPayload = JSON.parse(payload);
-    if (parsedPayload && parsedPayload.payload && parsedPayload.payload.action == "showPopup" && parsedPayload.payload.id && parsedPayload.payload.popType){
+    if (parsedPayload && parsedPayload.payload && parsedPayload.payload.action == "callDriverAlert" && parsedPayload.payload.id && parsedPayload.payload.popType) {
+      purescript.alertNotification(parsedPayload.payload.id)();
+    }else if (parsedPayload && parsedPayload.payload && parsedPayload.payload.action == "showPopup" && parsedPayload.payload.id && parsedPayload.payload.popType){
       window.callPopUp(parsedPayload.payload.popType, parsedPayload.payload.entityPayload);
     }
     else {
@@ -115,8 +122,15 @@ window.onMerchantEvent = function (event, payload) {
         payload: { jp_consuming_backpress: true }
       }
       JBridge.runInJuspayBrowser("onEvent", JSON.stringify(jpConsumingBackpress), "");
-      // var purescript = require("./output/Main");
-      purescript.main();
+      if (parsedPayload.payload.notificationData && parsedPayload.payload.notificationData.notification_type == "NEW_MESSAGE" && parsedPayload.payload.notificationData.entity_ids) {
+        eventObject.type = "NEW_MESSAGE";
+        eventObject.data = parsedPayload.payload.notificationData.entity_ids;
+        purescript.main(eventObject)();
+      }else {
+        eventObject.type = "";
+        eventObject.data = "";
+        purescript.main(eventObject)();
+      }
     }
   } else {
     console.error("unknown event: ", event);
@@ -174,7 +188,9 @@ window.callPopUp = function(type, entityPayload){
   } else if(type == "NEW_RIDE_AVAILABLE"){
     purescript.mainAllocationPop(type)(entityPayload)();}
   else{
-    purescript.main(); 
+    eventObject.type = "";
+    eventObject.data = "";
+    purescript.main(eventObject)(); 
   }
 }
 

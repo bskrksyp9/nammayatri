@@ -46,7 +46,8 @@ initData = {
     mediaType : Nothing
   },
   notifsDetailModelVisibility : GONE,
-  loadMore : false
+  loadMore : false,
+  selectedNotification : Nothing
 }
 
 dummyNotificationCard :: NotificationCardState 

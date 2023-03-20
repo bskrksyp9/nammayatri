@@ -77,7 +77,7 @@ homeScreen = do
     UpdateStage stage state -> do
       modifyScreenState $ HomeScreenStateType (\homeScreen → state)
       App.BackT $ App.BackPoint <$> (pure $ UPDATE_STAGE stage)
-    GoToNotifications -> App.BackT $ App.BackPoint <$> pure GO_TO_NOTIFICATIONS
+    GoToNotifications state -> App.BackT $ App.BackPoint <$> (pure $ GO_TO_NOTIFICATIONS state)
 -- DTHS.GoToStart screenState -> do
 --       (Location startRideCurrentLat startRideCurrentLiong) <- spy "george2" <$> (lift $ lift $ doAff $ makeAff \cb -> getCurrentPosition (cb <<< Right) Location $> nonCanceler)
 --       _ <- pure $ spy "lat handler" startRideCurrentLat

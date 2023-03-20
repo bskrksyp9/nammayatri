@@ -799,7 +799,13 @@ homeScreenFlow = do
     UPDATE_STAGE stage -> do
       _ <- updateStage $ HomeScreenStage stage
       homeScreenFlow
-    GO_TO_NOTIFICATIONS -> notificationFlow
+    GO_TO_NOTIFICATIONS state -> do
+      case state.props.selectedNotification of
+        Just id -> do
+          modifyScreenState $ NotificationsScreenStateType (\notificationScreen -> notificationScreen{ selectedNotification = state.props.selectedNotification })
+          modifyScreenState $ HomeScreenStateType (\homeScreen -> state{ props{ selectedNotification = Nothing } })
+        Nothing -> pure unit
+      notificationFlow
   pure unit
 
 constructLatLong :: String -> String -> Location
@@ -880,6 +886,11 @@ popUpScreenFlow entityPayload = do
     _ -> do
       _ <- pure $ printLog "no action matched" "."
       homeScreenFlow
+
+alertNotification :: String -> FlowBT String Unit
+alertNotification id = do
+  modifyScreenState $ HomeScreenStateType (\homeScreen -> homeScreen{ props{ selectedNotification = Just id } })
+  homeScreenFlow 
 
 driverRideRatingFlow :: FlowBT String Unit
 driverRideRatingFlow = do

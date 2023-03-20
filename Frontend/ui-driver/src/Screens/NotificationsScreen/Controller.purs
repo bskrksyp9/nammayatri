@@ -23,7 +23,7 @@ import Components.PopUpModal as PopUpModal
 import Components.PrimaryEditText as PrimaryEditText
 import Control.Monad.Except (runExceptT)
 import Control.Transformers.Back.Trans (runBackT)
-import Data.Array ((!!), union, length, unionBy, any) as Array
+import Data.Array ((!!), union, length, unionBy, any, filter) as Array
 import Data.Int (fromString)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String (Pattern(..), split, length)
@@ -177,10 +177,17 @@ eval (MessageListResAction (MessageListRes notificationArray)) state = do
   _ <- pure $ setRefreshing (getNewIDWithTag "NotificationSwipeRefresh") false
   let
     loadBtnDisabled = if (Array.length notificationArray == 0) then true else false
-  if state.loadMore then
-      continue $ state { shimmerLoader = AnimatedOut, recievedResponse = true, notificationList = Array.unionBy (\a b -> a.messageId == b.messageId) state.notificationList notificationsList, prestoListArrayItems = Array.unionBy (\a b -> a.messageId == b.messageId) state.prestoListArrayItems propValueList, loadMoreDisabled = loadBtnDisabled, loadMore = false }
-  else
-      continue $ state { shimmerLoader = AnimatedOut, recievedResponse = true, notificationList = Array.unionBy (\a b -> a.messageId == b.messageId) notificationsList state.notificationList, prestoListArrayItems = Array.unionBy (\a b -> a.messageId == b.messageId) propValueList state.prestoListArrayItems, loadMoreDisabled = loadBtnDisabled }
+  let
+    newState =  case state.loadMore of
+                  true  -> state { shimmerLoader = AnimatedOut, recievedResponse = true, notificationList = Array.unionBy (\a b -> a.messageId == b.messageId) state.notificationList notificationsList, prestoListArrayItems = Array.unionBy (\a b -> a.messageId == b.messageId) state.prestoListArrayItems propValueList, loadMoreDisabled = loadBtnDisabled, loadMore = false }
+                  false -> state { shimmerLoader = AnimatedOut, recievedResponse = true, notificationList = Array.unionBy (\a b -> a.messageId == b.messageId) notificationsList state.notificationList, prestoListArrayItems = Array.unionBy (\a b -> a.messageId == b.messageId) propValueList state.prestoListArrayItems, loadMoreDisabled = loadBtnDisabled }     
+  case newState.selectedNotification of
+    Just id -> do
+      let notificationItem = Array.filter (\a -> a.messageId == id) newState.notificationList
+      case notificationItem Array.!! 0 of
+        Just item -> continue newState{ notificationDetailModelState = notifisDetailStateTransformer item, notifsDetailModelVisibility = VISIBLE, selectedNotification = Nothing } 
+        Nothing   -> continue newState{ selectedNotification = Nothing }
+    Nothing -> continue newState
 
 eval LoadMore state = do
   exit $ LoaderOutput state{loadMore = true}

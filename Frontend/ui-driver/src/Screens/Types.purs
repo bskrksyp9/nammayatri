@@ -606,7 +606,8 @@ type HomeScreenProps =  {
   showDottedRoute :: Boolean,
   currentStage :: HomeScreenStage,
   mapRendered :: Boolean,
-  cancelConfirmationPopup :: Boolean
+  cancelConfirmationPopup :: Boolean,
+  selectedNotification :: Maybe String
  }
 
 type Location = {
@@ -929,7 +930,8 @@ type NotificationsScreenState = {
   recievedResponse :: Boolean,
   notificationDetailModelState :: NotificationDetailModelState,
   notifsDetailModelVisibility :: Visibility,
-  loadMore :: Boolean
+  loadMore :: Boolean,
+  selectedNotification :: Maybe String
 }
 
 type NotificationCardState = {

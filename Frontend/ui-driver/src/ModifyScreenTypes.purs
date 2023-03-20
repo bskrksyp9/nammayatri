@@ -125,5 +125,5 @@ updateStage stage = do
                 })
         HomeScreen -> do 
           _ <- pure $ removeAllPolylines ""
-          modifyScreenState $ HomeScreenStateType (\state -> HomeScreenData.initData) 
+          modifyScreenState $ HomeScreenStateType (\state -> HomeScreenData.initData{ props{ selectedNotification = state.props.selectedNotification } })
           

@@ -215,7 +215,7 @@ data HOME_SCREENOUTPUT = GO_TO_PROFILE_SCREEN
                           | FCM_NOTIFICATION String
                           | NOTIFY_CUSTOMER HomeScreenState
                           | UPDATE_STAGE HomeScreenStage
-                          | GO_TO_NOTIFICATIONS
+                          | GO_TO_NOTIFICATIONS HomeScreenState
                           
 data RIDE_DETAIL_SCREENOUTPUT = GO_TO_HOME_FROM_RIDE_DETAIL | SHOW_ROUTE_IN_RIDE_DETAIL
 data APPLICATION_STATUS_SCREENOUTPUT = GO_TO_HOME_FROM_APPLICATION_STATUS

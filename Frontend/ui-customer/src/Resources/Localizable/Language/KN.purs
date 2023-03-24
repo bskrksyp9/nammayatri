@@ -226,6 +226,7 @@ getKN script = case script of
   CHANGE_DROP_LOCATION -> "ಡ್ರಾಪ್ ಸ್ಥಳವನ್ನು ಬದಲಾಯಿಸಿ"
   YOU_CAN_TAKE_A_WALK_OR_CONTINUE_WITH_RIDE_BOOKING -> "ನೀವು ನಡೆಯಬಹುದು ಅಥವಾ ರೈಡ್ ಬುಕ್ ಮಾಡುವುದನ್ನು ಮುಂದುವರಿಸಬಹುದು"
   YOUR_TRIP_IS_TOO_SHORT_YOU_ARE_JUST -> "ನಿಮ್ಮ ಪ್ರವಾಸವು ತುಂಬಾ ಚಿಕ್ಕದಾಗಿದೆ. ನಿಮ್ಮ ಗಮ್ಯಸ್ಥಾನದಿಂದ ನೀವು ಕೇವಲ "
+  THE_DESTINATION_IS_TOO_CLOSE -> "ಗಮ್ಯಸ್ಥಾನವು ತುಂಬಾ ಹತ್ತಿರದಲ್ಲಿದೆ. ನೀವು ಬೇರೆ ಪಿಕಪ್ ಮತ್ತು ಡ್ರಾಪ್ ಹೊಂದಿರುವಿರಾ ಎಂಬುದನ್ನು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
   METERS_AWAY_FROM_YOUR_DESTINATION -> " ಮೀ ದೂರದಲ್ಲಿದ್ದೀರಿ!"
   BOOK_RIDE_ -> "ರೈಡ್ ಬುಕ್ ಮಾಡಿ"
   LOCATION_UNSERVICEABLE -> "ಸ್ಥಳವು ಸೇವೆಗೆ ಅರ್ಹವಲ್ಲ"

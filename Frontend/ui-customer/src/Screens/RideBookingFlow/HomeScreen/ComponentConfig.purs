@@ -44,6 +44,7 @@ import Font.Style as FontStyle
 import Styles.Colors as Color
 import Common.Types.App
 import PrestoDOM
+import Resources.Constants
 
 shareAppConfig :: ST.HomeScreenState -> PopUpModal.Config
 shareAppConfig state = let
@@ -380,9 +381,21 @@ shortDistanceConfig :: ST.HomeScreenState -> PopUpModal.Config
 shortDistanceConfig state =
   let
     config' = PopUpModal.config
-    popUpConfig' =
+    minDistThreshold = getMinThresholdDist
+    shortDistConfig' =
       config'
-        { backgroundClickable = false
+        { gravity = CENTER
+        , cornerRadius = (Corners 15.0 true true true true)
+        , margin = (MarginHorizontal 24 24)
+        , backgroundClickable = false
+        , coverImageConfig
+          {
+            imageUrl = "ic_similar_pickup_drop,https://assets.juspay.in/nammayatri/images/common/ic_similar_pickup_drop.png"
+          , height = V 200
+          , width = V 280
+          , margin = (Margin 16 20 16 0)
+          , visibility = VISIBLE
+          }
         , primaryText
           { text = (getString YOUR_TRIP_IS_TOO_SHORT_YOU_ARE_JUST) <> HU.toString (state.props.distance) <> (getString METERS_AWAY_FROM_YOUR_DESTINATION)
           , margin = (Margin 16 20 16 0)
@@ -390,13 +403,35 @@ shortDistanceConfig state =
           }
         , secondaryText
           { text = (getString YOU_CAN_TAKE_A_WALK_OR_CONTINUE_WITH_RIDE_BOOKING)
-          , margin = (Margin 0 16 0 20)
+          , margin = (MarginVertical 16 20)
           }
-        , option1 { text = (getString GO_BACK_) }
-        , option2 { text = (getString BOOK_RIDE_) }
+        , option1 
+        { text = (getString GO_BACK_) 
+        , fontSize = FontSize.a_16
+        , color = Color.black700
+        , strokeColor = Color.black700 
+        } 
+        , option2 
+        { text = (getString BOOK_RIDE_)
+        , fontSize = FontSize.a_16
+        , margin = (MarginLeft 12)
+        }
+        }
+    veryShortDistConfig' =
+     shortDistConfig'
+        { buttonLayoutMargin = (Margin 16 0 16 20)
+        , secondaryText { text = (getString THE_DESTINATION_IS_TOO_CLOSE) }
+        , option1 
+          { width = V 280
+          , margin = (Margin 40 0 40 20)
+          , background = Color.black900
+          , strokeColor = Color.black900
+          , color = Color.yellow900
+          }
+        , option2 { visibility = false }
         }
   in
-    popUpConfig'
+    if state.props.distance < minDistThreshold then veryShortDistConfig' else shortDistConfig'
 
 sourceUnserviceableConfig :: ST.HomeScreenState -> ErrorModal.Config
 sourceUnserviceableConfig state =

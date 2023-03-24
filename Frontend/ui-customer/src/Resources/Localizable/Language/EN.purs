@@ -228,6 +228,7 @@ getEN script = case script of
   CHANGE_DROP_LOCATION -> "Change Drop Location"
   YOU_CAN_TAKE_A_WALK_OR_CONTINUE_WITH_RIDE_BOOKING -> "You may wish to walk or continue with the ride booking"
   YOUR_TRIP_IS_TOO_SHORT_YOU_ARE_JUST -> "Your trip distance is too short. Destination is just "
+  THE_DESTINATION_IS_TOO_CLOSE -> "The destination is too close to book an auto. Please ensure you have a different pickup and drop."
   METERS_AWAY_FROM_YOUR_DESTINATION -> "m away!"
   BOOK_RIDE_ -> "Book Ride"
   CANCEL_AUTO_ASSIGNING -> "Cancel Auto Assigning"

@@ -167,3 +167,6 @@ getKeyByLanguage language = case language of
   "MALAYALAM" -> "ML_IN" 
   "TAMIL"   ->"TA_IN"
   _ -> "EN_US" 
+
+getMinThresholdDist :: Int
+getMinThresholdDist = 10

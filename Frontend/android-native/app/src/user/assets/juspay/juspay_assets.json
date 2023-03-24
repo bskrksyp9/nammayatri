@@ -44,6 +44,7 @@
       "ic_ride_not_found" : true,
       "ic_roundcorner_overlay" : true,
       "ic_share_location" : true,
+      "ic_similar_pickup_drop" : true,
       "label_shadow" : true,
       "loader_overlay" : true,
       "ny_ic_add_address" : true,

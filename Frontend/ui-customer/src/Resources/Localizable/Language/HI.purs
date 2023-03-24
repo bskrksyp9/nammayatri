@@ -226,6 +226,7 @@ getHI script = case script of
   CHANGE_DROP_LOCATION -> "ड्रॉप स्थान बदलें"
   YOU_CAN_TAKE_A_WALK_OR_CONTINUE_WITH_RIDE_BOOKING -> "आप पैदल चलकर जा सकते हैं या सवारी बुकिंग जारी रख सकते हैं"
   YOUR_TRIP_IS_TOO_SHORT_YOU_ARE_JUST -> "आपकी यात्रा बहुत छोटी है। आप अपने गंतव्य से सिर्फ "
+  THE_DESTINATION_IS_TOO_CLOSE -> "गंतव्य एक ऑटो बुक करने के लिए बहुत करीब है। कृपया सुनिश्चित करें कि आपके पास एक अलग पिकअप और ड्रॉप है।"
   METERS_AWAY_FROM_YOUR_DESTINATION -> " मीटर दूर हैं!"
   BOOK_RIDE_ -> "सवारी बुक करें"
   LOCATION_UNSERVICEABLE -> "स्थान अनुपयोगी"

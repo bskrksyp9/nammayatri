@@ -332,4 +332,6 @@ shimmerData i =
   , previewImageTitle: toPropValue "Preview Image"
   , imageVisibility : toPropValue "gone"
   , messageId: toPropValue ""
+  , imageWithUrl : toPropValue ""
+  , imageWithUrlVisibility : toPropValue ""
   }

@@ -988,7 +988,9 @@ type NotificationCardPropState = {
   previewImage :: PropValue,
   previewImageTitle :: PropValue,
   imageVisibility :: PropValue,
-  messageId :: PropValue
+  messageId :: PropValue,
+  imageWithUrl :: PropValue,
+  imageWithUrlVisibility :: PropValue
 }
 
 type NotificationDetailModelState = {

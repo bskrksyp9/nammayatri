@@ -35,7 +35,7 @@ import JBridge (renderBase64Image, openUrlInApp)
 import Language.Strings (getString)
 import Language.Types (STR(..))
 import Prelude (Unit, bind, const, pure, show, unit, ($), (<<<), (<>), (==), (&&), (-))
-import PrestoDOM (Gravity(..), Length(..), Margin(..), Orientation(..), Padding(..), PrestoDOM, Visibility(..), afterRender, background, clickable, color, cornerRadius, fontStyle, gravity, height, id, imageUrl, imageView, linearLayout, margin, onAnimationEnd, onClick, orientation, padding, progressBar, relativeLayout, stroke, text, textSize, textView, visibility, weight, width, scrollBarY, scrollView, lineHeight, textFromHtml)
+import PrestoDOM (Gravity(..), Length(..), Margin(..), Orientation(..), Padding(..), PrestoDOM, Visibility(..), afterRender, background, clickable, color, cornerRadius, fontStyle, gravity, height, id, imageUrl, imageView, lineHeight, linearLayout, margin, onAnimationEnd, onClick, orientation, padding, progressBar, relativeLayout, scrollBarY, scrollView, stroke, text, textFromHtml, textSize, textView, visibility, weight, width)
 import PrestoDOM.Types.DomAttributes (Corners(..))
 import Screens.Types (NotificationDetailModelState, YoutubeData, YoutubeVideoStatus(..))
 import Services.APITypes (MediaType(..))
@@ -121,6 +121,13 @@ view push state =
                                           [ width WRAP_CONTENT
                                           , height WRAP_CONTENT
                                           ]
+                                      ]
+                                    , imageView
+                                      [ width MATCH_PARENT
+                                      , height $ V 150
+                                      , gravity CENTER
+                                      , imageUrl state.mediaUrl
+                                      , visibility if state.mediaType == Just ImageLink then VISIBLE else GONE
                                       ]
                                   ]
                         ]

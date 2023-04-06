@@ -312,6 +312,9 @@ data STR = LETS_GET_STARTED
         | CUSTOMER_WAS_RUDE
         | ALERT
         | ALL_ALERTS
+        | ALL_MESSAGES
+        | MESSAGES
+        | MESSAGE
         | ADD_A_COMMENT
         | POST_COMMENT
         | ENTER_YOUR_COMMENT
@@ -720,6 +723,9 @@ type TRAFFIC_JAM = String
 type CUSTOMER_WAS_RUDE = String 
 type ALERT = String
 type ALL_ALERTS = String
+type ALL_MESSAGES = String
+type MESSAGES = String
+type MESSAGE = String
 type ADD_A_COMMENT = String
 type POST_COMMENT = String
 type ENTER_YOUR_COMMENT = String

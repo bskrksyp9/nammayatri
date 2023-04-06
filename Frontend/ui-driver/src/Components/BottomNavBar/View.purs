@@ -75,7 +75,7 @@ view push state =
                       "Rides"         -> getString RIDES
                       "Contest"       -> getString CONTEST
                       "Profile"       -> getString PROFILE
-                      "Alert"         -> getString ALERTS
+                      "Alert"         -> getString MESSAGES
                       _               -> ""
              ] <> FontStyle.tags TypoGraphy)
            ]

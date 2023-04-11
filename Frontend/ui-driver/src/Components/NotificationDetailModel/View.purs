@@ -122,18 +122,28 @@ view push state =
                                           , height WRAP_CONTENT
                                           ]
                                       ]
-                                    , imageView
+                                    , linearLayout
                                       [ width MATCH_PARENT
                                       , height WRAP_CONTENT
                                       , gravity CENTER
-                                      , id $ getNewIDWithTag "imageWithUrl"
-                                      , imageUrl state.mediaUrl
                                       , visibility if state.mediaType == Just ImageLink then VISIBLE else GONE
-                                      , afterRender
-                                          ( \action -> do
-                                          _ <- pure $ setScaleType (getNewIDWithTag "imageWithUrl") state.mediaUrl "FIT_XY"
-                                          pure unit)
-                                          (const AfterRender)
+                                      ]
+                                      [ progressBar
+                                          [ width WRAP_CONTENT
+                                          , height WRAP_CONTENT
+                                          , padding $ PaddingVertical 5 5
+                                          ]
+                                        , imageView
+                                          [ width MATCH_PARENT
+                                          , visibility GONE
+                                          , gravity CENTER
+                                          , id $ getNewIDWithTag "imageWithUrl"
+                                          , afterRender
+                                              ( \action -> do
+                                              _ <- pure $ setScaleType (getNewIDWithTag "imageWithUrl") state.mediaUrl "FIT_XY"
+                                              pure unit)
+                                              (const AfterRender)
+                                          ]
                                       ]
                                   ]
                         ]

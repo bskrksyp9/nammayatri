@@ -1977,8 +1977,13 @@ public class CommonJsInterface extends JBridge implements in.juspay.hypersdk.cor
                                     public void run() {
                                         if (bitmap == null) return;
                                         int tempWidth = Math.min(bitmap.getWidth(), getScreenWidth());
-                                        imageView.setMinimumHeight(tempWidth * (getScreenHeight()/getScreenWidth()));
+                                        imageView.getLayoutParams().height =  (tempWidth * (getScreenHeight()/getScreenWidth()));
                                         imageView.setScaleType(getScaleTypes(scaleType));
+                                        imageView.setImageBitmap(bitmap);
+                                        LinearLayout linearLayout = (LinearLayout) imageView.getParent();
+                                        linearLayout.removeAllViews();
+                                        linearLayout.addView(imageView);
+                                        imageView.setVisibility(View.VISIBLE);
                                     }
                                 });
                             } catch (Exception e) {

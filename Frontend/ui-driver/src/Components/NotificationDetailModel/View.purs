@@ -31,7 +31,7 @@ import Engineering.Helpers.Commons (flowRunner, getNewIDWithTag)
 import Font.Size as FontSize
 import Font.Style as FontStyle
 import Helpers.Utils (addMediaPlayer, getVideoID, setYoutubePlayer)
-import JBridge (renderBase64Image, openUrlInApp)
+import JBridge (renderBase64Image, openUrlInApp, setScaleType)
 import Language.Strings (getString)
 import Language.Types (STR(..))
 import Prelude (Unit, bind, const, pure, show, unit, ($), (<<<), (<>), (==), (&&), (-))
@@ -124,10 +124,16 @@ view push state =
                                       ]
                                     , imageView
                                       [ width MATCH_PARENT
-                                      , height $ V 150
+                                      , height WRAP_CONTENT
                                       , gravity CENTER
+                                      , id $ getNewIDWithTag "imageWithUrl"
                                       , imageUrl state.mediaUrl
                                       , visibility if state.mediaType == Just ImageLink then VISIBLE else GONE
+                                      , afterRender
+                                          ( \action -> do
+                                          _ <- pure $ setScaleType (getNewIDWithTag "imageWithUrl") state.mediaUrl "FIT_XY"
+                                          pure unit)
+                                          (const AfterRender)
                                       ]
                                   ]
                         ]

@@ -88,7 +88,8 @@ foreign import disableActionEditText :: String -> Unit
 foreign import uploadFile :: Unit -> Effect Unit 
 foreign import previewImage :: String -> Effect Unit 
 foreign import storeCallBackImageUpload :: forall action. (action -> Effect Unit) -> (String -> String -> action) -> Effect Unit
-foreign import renderBase64Image :: String -> String -> Effect Unit 
+foreign import renderBase64Image :: String -> String -> Effect Unit
+foreign import setScaleType :: String -> String -> String -> Effect Unit 
 foreign import copyToClipboard :: String -> Unit
 foreign import drawRoute :: Locations -> String -> String -> Boolean -> String -> String -> Int -> String -> String -> String -> Effect Unit
 foreign import isCoordOnPath :: Locations -> Number -> Number -> Int -> Effect IsLocationOnPath

@@ -1068,6 +1068,14 @@ exports["renderBase64Image"] = function (image) {
   };
 };
 
+exports["setScaleType"] = function (id) {
+  return function (url) {
+    return function (scaleType) {
+      return JBridge.setScaleType(id, url, scaleType);
+    }
+  };
+};
+
 exports["isOverlayPermissionEnabled"] = function (unit) {
   return function () {
     return JBridge.isOverlayPermissionEnabled();

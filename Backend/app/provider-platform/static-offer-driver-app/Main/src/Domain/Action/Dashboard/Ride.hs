@@ -28,7 +28,6 @@ import qualified Data.Time as Time
 import qualified Domain.Types.Booking as DBooking
 import qualified Domain.Types.Booking.BookingLocation as DBLoc
 import qualified Domain.Types.BookingCancellationReason as DBCReason
-import qualified Domain.Types.CancellationReason as DCReason
 import qualified Domain.Types.Merchant as DM
 import qualified Domain.Types.Person as DP
 import qualified Domain.Types.Ride as DRide
@@ -126,7 +125,7 @@ rideInfo merchantShortId reqRideId = do
       else pure Nothing
   driverInitiatedCallCount <- runInReplica $ QCallStatus.countCallsByRideId rideId
   let cancellationReason =
-        (coerce @DCReason.CancellationReasonCode @Common.CancellationReasonCode <$>) . join $ mbBCReason <&> (.reasonCode)
+        join $ mbBCReason <&> (.reasonCode)
   let cancelledBy = castCancellationSource <$> (mbBCReason <&> (.source))
   let cancelledTime = case ride.status of
         DRide.CANCELLED -> Just ride.updatedAt

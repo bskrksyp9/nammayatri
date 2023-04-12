@@ -14,8 +14,8 @@
 
 module Flow.RideAPI.CancelRide (cancelRide) where
 
+import Beckn.Types.Core.Taxi.CancellationReasons.Types
 import qualified Domain.Action.UI.Ride.CancelRide as CancelRide
-import Domain.Types.CancellationReason
 import qualified Domain.Types.Merchant as DM
 import qualified Domain.Types.Person as Person
 import qualified Domain.Types.Ride as Ride

@@ -106,6 +106,16 @@ cancel ::
   m CancelRes
 cancel = callBecknAPIWithSignature "cancel" API.cancelAPI
 
+cancellationReasons ::
+  ( MonadFlow m,
+    CoreMetrics m,
+    HasBapInfo r m
+  ) =>
+  BaseUrl ->
+  CancelReq ->
+  m CancelRes
+cancellationReasons = callBecknAPIWithSignature "cancel" API.cancelAPI
+
 callTrack ::
   ( MonadFlow m,
     CoreMetrics m,

@@ -14,7 +14,7 @@
 
 module Storage.Queries.CancellationReason where
 
-import Domain.Types.CancellationReason
+import Beckn.Types.Core.Taxi.CancellationReasons.Types
 import Kernel.Prelude
 import Kernel.Storage.Esqueleto as Esq
 import Storage.Tabular.CancellationReason

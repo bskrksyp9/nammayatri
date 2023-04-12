@@ -19,13 +19,13 @@ import "static-offer-driver-app" API.UI.Location as LocationAPI
 import "rider-app" API.UI.Quote hiding (getQuotes)
 import qualified "static-offer-driver-app" API.UI.Ride as RideAPI
 import qualified "rider-app" API.UI.Search as AppSearch
+import qualified Beckn.Types.Core.Taxi.CancellationReasons.Types as SCR
 import Common
 import qualified "static-offer-driver-app" Domain.Action.UI.Booking as DUB
 import qualified "rider-app" Domain.Types.Booking as BRB
 import qualified "static-offer-driver-app" Domain.Types.Booking as TBooking
 import qualified "static-offer-driver-app" Domain.Types.Booking as TRB
 import qualified "rider-app" Domain.Types.CancellationReason as AppCR
-import qualified "static-offer-driver-app" Domain.Types.CancellationReason as SCR
 import qualified "static-offer-driver-app" Domain.Types.Merchant.MerchantServiceConfig as TDMSC
 import "static-offer-driver-app" Domain.Types.Person as TPerson
 import qualified "rider-app" Domain.Types.Quote as AppQuote

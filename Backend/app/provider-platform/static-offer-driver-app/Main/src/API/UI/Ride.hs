@@ -22,6 +22,7 @@ module API.UI.Ride
   )
 where
 
+import Beckn.Types.Core.Taxi.CancellationReasons.Types (CancellationReasonCode (..))
 import Domain.Action.UI.Ride as Reexport
   ( DriverRideListRes (..),
     DriverRideRes (..),
@@ -30,7 +31,6 @@ import qualified Domain.Action.UI.Ride as DRide
 import qualified Domain.Action.UI.Ride.CancelRide as CHandler
 import qualified Domain.Action.UI.Ride.EndRide as EHandler
 import qualified Domain.Action.UI.Ride.StartRide as SHandler
-import Domain.Types.CancellationReason (CancellationReasonCode (..))
 import qualified Domain.Types.Person as SP
 import qualified Domain.Types.Ride as SRide
 import Environment

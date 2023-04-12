@@ -16,12 +16,10 @@
 module API.Dashboard.Ride where
 
 import qualified "dashboard-helper-api" Dashboard.ProviderPlatform.Ride as Common
-import Data.Coerce (coerce)
 import qualified Domain.Action.Dashboard.Ride as DRide
 import qualified Domain.Action.UI.Ride.CancelRide as CHandler
 import qualified Domain.Action.UI.Ride.EndRide as EHandler
 import qualified Domain.Action.UI.Ride.StartRide as SHandler
-import qualified Domain.Types.CancellationReason as DCReason
 import qualified Domain.Types.Merchant as DM
 import qualified Domain.Types.Ride as DRide
 import Environment
@@ -90,7 +88,7 @@ rideCancel merchantShortId reqRideId Common.CancelRideReq {reasonCode, additiona
   let rideId = cast @Common.Ride @DRide.Ride reqRideId
   let dashboardReq =
         CHandler.CancelRideReq
-          { reasonCode = coerce @Common.CancellationReasonCode @DCReason.CancellationReasonCode reasonCode,
+          { reasonCode = reasonCode,
             additionalInfo
           }
   CHandler.dashboardCancelRideHandler CHandler.cancelRideHandle merchant.id rideId dashboardReq

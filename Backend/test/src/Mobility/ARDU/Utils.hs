@@ -18,12 +18,12 @@ import qualified "dynamic-offer-driver-app" API.UI.Driver as TDriver
 import qualified "dynamic-offer-driver-app" API.UI.Ride as RideAPI
 import qualified "rider-app" API.UI.Search as AppSearch
 import qualified API.UI.Select as AppSelect
+import qualified Beckn.Types.Core.Taxi.CancellationReasons.Types as SCR
 import Common
 import qualified "rider-app" Domain.Action.UI.Cancel as AppCancel
 import qualified "rider-app" Domain.Action.UI.Select as DSelect
 import qualified "dynamic-offer-driver-app" Domain.Types.Booking as TRB
 import qualified "rider-app" Domain.Types.Booking as AppRB
-import qualified "dynamic-offer-driver-app" Domain.Types.CancellationReason as SCR
 import qualified "rider-app" Domain.Types.CancellationReason as AppCR
 import qualified "dynamic-offer-driver-app" Domain.Types.DriverInformation as TDrInfo
 import qualified "rider-app" Domain.Types.Estimate as AppEstimate
@@ -283,7 +283,7 @@ cancelRideByApp appToken driver bapBookingId = do
   void . callBAP $
     BapAPI.cancelRide bapBookingId appToken $
       AppCancel.CancelReq
-        { reasonCode = AppCR.CancellationReasonCode "",
+        { reasonCode = SCR.CancellationReasonCode "",
           reasonStage = AppCR.OnAssign,
           additionalInfo = Nothing
         }

@@ -21,6 +21,7 @@ module Domain.Action.Dashboard.Ride
   )
 where
 
+import qualified Beckn.Types.Core.Taxi.CancellationReasons.Types as DCReason
 import qualified "dashboard-helper-api" Dashboard.ProviderPlatform.Ride as Common
 import Data.Coerce (coerce)
 import qualified Data.Text as T
@@ -28,7 +29,6 @@ import qualified Data.Time as Time
 import qualified Domain.Types.Booking as DBooking
 import qualified Domain.Types.Booking.BookingLocation as DBLoc
 import qualified Domain.Types.BookingCancellationReason as DBCReason
-import qualified Domain.Types.CancellationReason as DCReason
 import qualified Domain.Types.Merchant as DM
 import qualified Domain.Types.Person as DP
 import qualified Domain.Types.Ride as DRide

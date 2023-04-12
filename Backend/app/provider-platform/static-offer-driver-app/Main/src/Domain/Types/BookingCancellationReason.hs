@@ -15,8 +15,8 @@
 
 module Domain.Types.BookingCancellationReason where
 
+import Beckn.Types.Core.Taxi.CancellationReasons.Types (CancellationReasonCode)
 import qualified Domain.Types.Booking as DRB
-import Domain.Types.CancellationReason (CancellationReasonCode)
 import Domain.Types.Person (Person)
 import qualified Domain.Types.Ride as DRide
 import EulerHS.Prelude hiding (id)

@@ -21,9 +21,9 @@ module Domain.Action.UI.Ride.CancelRide
   )
 where
 
+import Beckn.Types.Core.Taxi.CancellationReasons.Types (CancellationReasonCode (..))
 import qualified Domain.Action.UI.Ride.CancelRide.Internal as CInternal
 import qualified Domain.Types.BookingCancellationReason as DBCR
-import Domain.Types.CancellationReason (CancellationReasonCode (..))
 import qualified Domain.Types.Merchant as DM
 import qualified Domain.Types.Person as DP
 import qualified Domain.Types.Ride as DRide

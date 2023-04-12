@@ -17,11 +17,10 @@ module Domain.Action.Dashboard.Booking
   )
 where
 
+import Beckn.Types.Core.Taxi.CancellationReasons.Types (CancellationReasonCode (..))
 import qualified "dashboard-helper-api" Dashboard.Common.Booking as Common
-import Data.Coerce (coerce)
 import qualified Domain.Types.Booking as DBooking
 import qualified Domain.Types.BookingCancellationReason as DBCR
-import qualified Domain.Types.CancellationReason as DCR
 import qualified Domain.Types.Merchant as DM
 import qualified Domain.Types.Person as DP
 import qualified Domain.Types.Ride as DRide
@@ -77,13 +76,13 @@ stuckBookingsCancel merchantShortId req = do
   logTagInfo "dashboard -> stuckBookingsCancel: " $ show allStuckBookingIds
   pure $ mkStuckBookingsCancelRes stuckBookingIds stuckRideItems
 
-mkBookingCancellationReason :: Common.CancellationReasonCode -> Maybe (Id DRide.Ride) -> Id DBooking.Booking -> DBCR.BookingCancellationReason
+mkBookingCancellationReason :: CancellationReasonCode -> Maybe (Id DRide.Ride) -> Id DBooking.Booking -> DBCR.BookingCancellationReason
 mkBookingCancellationReason reasonCode mbRideId bookingId = do
   DBCR.BookingCancellationReason
     { bookingId = bookingId,
       rideId = mbRideId,
       source = DBCR.ByMerchant,
-      reasonCode = Just $ coerce @Common.CancellationReasonCode @DCR.CancellationReasonCode reasonCode,
+      reasonCode = Just reasonCode,
       driverId = Nothing,
       additionalInfo = Nothing
     }

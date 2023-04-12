@@ -20,7 +20,7 @@
 
 module Storage.Tabular.CancellationReason where
 
-import qualified Domain.Types.CancellationReason as Domain
+import qualified Beckn.Types.Core.Taxi.CancellationReasons.Types as CR
 import Kernel.Prelude
 import Kernel.Storage.Esqueleto
 
@@ -31,27 +31,27 @@ mkPersist
       reasonCode Text
       description Text
       enabled Bool
+      priority Int
       Primary reasonCode
       deriving Generic
-      priority Int
     |]
 
 instance TEntityKey CancellationReasonT where
-  type DomainKey CancellationReasonT = Domain.CancellationReasonCode
-  fromKey (CancellationReasonTKey _id) = Domain.CancellationReasonCode _id
-  toKey (Domain.CancellationReasonCode id) = CancellationReasonTKey id
+  type DomainKey CancellationReasonT = CR.CancellationReasonCode
+  fromKey (CancellationReasonTKey _id) = CR.CancellationReasonCode _id
+  toKey (CR.CancellationReasonCode id) = CancellationReasonTKey id
 
-instance FromTType CancellationReasonT Domain.CancellationReason where
+instance FromTType CancellationReasonT CR.CancellationReason where
   fromTType CancellationReasonT {..} = do
     return $
-      Domain.CancellationReason
-        { reasonCode = Domain.CancellationReasonCode reasonCode,
+      CR.CancellationReason
+        { reasonCode = CR.CancellationReasonCode reasonCode,
           ..
         }
 
-instance ToTType CancellationReasonT Domain.CancellationReason where
-  toTType Domain.CancellationReason {..} =
+instance ToTType CancellationReasonT CR.CancellationReason where
+  toTType CR.CancellationReason {..} =
     CancellationReasonT
-      { reasonCode = let (Domain.CancellationReasonCode rc) = reasonCode in rc,
+      { reasonCode = let (CR.CancellationReasonCode rc) = reasonCode in rc,
         ..
       }

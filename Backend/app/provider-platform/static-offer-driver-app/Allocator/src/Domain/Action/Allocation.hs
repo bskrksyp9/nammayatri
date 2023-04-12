@@ -14,12 +14,12 @@
 
 module Domain.Action.Allocation where
 
+import qualified Beckn.Types.Core.Taxi.CancellationReasons.Types as SCR
 import Data.Generics.Labels ()
 import qualified Data.Text as T
 import qualified Domain.Types.AllocationEvent as DAllocEvent (AllocationEventType (..))
 import qualified Domain.Types.Booking as SRB
 import qualified Domain.Types.BookingCancellationReason as SBCR
-import qualified Domain.Types.CancellationReason as SCR
 import Domain.Types.Merchant
 import Domain.Types.Person (Driver)
 import qualified Domain.Types.RideRequest as SRR

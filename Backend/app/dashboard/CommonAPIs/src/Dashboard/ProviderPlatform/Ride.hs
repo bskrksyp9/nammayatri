@@ -20,8 +20,8 @@ module Dashboard.ProviderPlatform.Ride
   )
 where
 
+import Beckn.Types.Core.Taxi.CancellationReasons.Types as Reexport (CancellationReasonCode (..))
 import Dashboard.Common as Reexport
-import Dashboard.Common.Booking as Reexport (CancellationReasonCode (..))
 import Data.Aeson
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Text as T

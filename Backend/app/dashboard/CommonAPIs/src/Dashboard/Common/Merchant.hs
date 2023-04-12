@@ -26,6 +26,7 @@ import Data.Aeson
 import Data.Either (isRight)
 import Data.List.Extra (anySame)
 import Data.OpenApi hiding (description, name, password, url)
+import qualified Kernel.External.Call as Call
 import Kernel.External.Encryption (encrypt)
 import qualified Kernel.External.FCM.Flow as FCM
 import qualified Kernel.External.FCM.Types as FCM
@@ -33,6 +34,7 @@ import qualified Kernel.External.Maps as Maps
 import qualified Kernel.External.SMS as SMS
 import qualified Kernel.External.SMS.ExotelSms.Types as Exotel
 import qualified Kernel.External.Verification as Verification
+import qualified Kernel.External.Whatsapp.Types as Whatsapp
 import Kernel.Prelude
 import Kernel.Storage.Esqueleto (derivePersistField)
 import Kernel.Types.APISuccess (APISuccess)
@@ -486,6 +488,34 @@ newtype IdfyCfgUpdateTReq = IdfyCfgUpdateTReq
 instance HideSecrets IdfyCfgUpdateReq where
   type ReqWithoutSecrets IdfyCfgUpdateReq = IdfyCfgUpdateTReq
   hideSecrets IdfyCfgUpdateReq {..} = IdfyCfgUpdateTReq {..}
+
+---------------------------------------------------------
+-- merchant service usage config ------------------------
+
+type ServiceUsageConfigAPI =
+  "serviceUsageConfig"
+    :> Get '[JSON] ServiceUsageConfigRes
+
+-- FIXME fields are different in different apps
+data ServiceUsageConfigRes = ServiceUsageConfigRes
+  { initiateCall :: Call.CallService,
+    getDistances :: Maps.MapsService,
+    getEstimatedPickupDistances :: Maps.MapsService,
+    getRoutes :: Maps.MapsService,
+    getPickupRoutes :: Maps.MapsService,
+    getTripRoutes :: Maps.MapsService,
+    snapToRoad :: Maps.MapsService,
+    getPlaceName :: Maps.MapsService,
+    getPlaceDetails :: Maps.MapsService,
+    autoComplete :: Maps.MapsService,
+    smsProvidersPriorityList :: [SMS.SmsService],
+    whatsappProvidersPriorityList :: [Whatsapp.WhatsappService],
+    verificationService :: Verification.VerificationService,
+    updatedAt :: UTCTime,
+    createdAt :: UTCTime
+  }
+  deriving stock (Show, Generic)
+  deriving anyclass (ToJSON, FromJSON, ToSchema)
 
 ---------------------------------------------------------
 -- merchant maps service config usage update ------------

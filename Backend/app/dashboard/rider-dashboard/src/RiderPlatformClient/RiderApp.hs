@@ -62,6 +62,7 @@ data RidesAPIs = RidesAPIs
 
 data MerchantAPIs = MerchantAPIs
   { merchantUpdate :: Merchant.MerchantUpdateReq -> Euler.EulerClient APISuccess,
+    serviceUsageConfig :: Euler.EulerClient Merchant.ServiceUsageConfigRes,
     mapsServiceConfigUpdate :: Merchant.MapsServiceConfigUpdateReq -> Euler.EulerClient APISuccess,
     mapsServiceUsageConfigUpdate :: Merchant.MapsServiceUsageConfigUpdateReq -> Euler.EulerClient APISuccess,
     smsServiceConfigUpdate :: Merchant.SmsServiceConfigUpdateReq -> Euler.EulerClient APISuccess,
@@ -93,6 +94,7 @@ mkAppBackendAPIs merchantId token = do
       :<|> rideList = ridesClient
 
     merchantUpdate
+      :<|> serviceUsageConfig
       :<|> mapsServiceConfigUpdate
       :<|> mapsServiceUsageConfigUpdate
       :<|> smsServiceConfigUpdate

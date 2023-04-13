@@ -496,21 +496,20 @@ type ServiceUsageConfigAPI =
   "serviceUsageConfig"
     :> Get '[JSON] ServiceUsageConfigRes
 
--- FIXME fields are different in different apps
 data ServiceUsageConfigRes = ServiceUsageConfigRes
   { initiateCall :: Call.CallService,
     getDistances :: Maps.MapsService,
-    getEstimatedPickupDistances :: Maps.MapsService,
+    getEstimatedPickupDistances :: Maybe Maps.MapsService,
     getRoutes :: Maps.MapsService,
-    getPickupRoutes :: Maps.MapsService,
-    getTripRoutes :: Maps.MapsService,
+    getPickupRoutes :: Maybe Maps.MapsService,
+    getTripRoutes :: Maybe Maps.MapsService,
     snapToRoad :: Maps.MapsService,
     getPlaceName :: Maps.MapsService,
     getPlaceDetails :: Maps.MapsService,
     autoComplete :: Maps.MapsService,
     smsProvidersPriorityList :: [SMS.SmsService],
-    whatsappProvidersPriorityList :: [Whatsapp.WhatsappService],
-    verificationService :: Verification.VerificationService,
+    whatsappProvidersPriorityList :: Maybe [Whatsapp.WhatsappService],
+    verificationService :: Maybe Verification.VerificationService,
     updatedAt :: UTCTime,
     createdAt :: UTCTime
   }

@@ -450,7 +450,15 @@ serviceUsageConfig merchantShortId = do
   pure $ mkServiceUsageConfigRes config
 
 mkServiceUsageConfigRes :: DMSUC.MerchantServiceUsageConfig -> Common.ServiceUsageConfigRes
-mkServiceUsageConfigRes DMSUC.MerchantServiceUsageConfig {..} = Common.ServiceUsageConfigRes {..}
+mkServiceUsageConfigRes DMSUC.MerchantServiceUsageConfig {..} =
+  Common.ServiceUsageConfigRes
+    { getEstimatedPickupDistances = Just getEstimatedPickupDistances,
+      getPickupRoutes = Just getPickupRoutes,
+      getTripRoutes = Just getTripRoutes,
+      whatsappProvidersPriorityList = Just whatsappProvidersPriorityList,
+      verificationService = Just verificationService,
+      ..
+    }
 
 ---------------------------------------------------------------------
 mapsServiceUsageConfigUpdate ::

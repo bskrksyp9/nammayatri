@@ -36,6 +36,7 @@ import "lib-dashboard" Tools.Auth.Merchant
 type API =
   "merchant"
     :> ( MerchantUpdateAPI
+           :<|> ServiceUsageConfigAPI
            :<|> MapsServiceConfigUpdateAPI
            :<|> MapsServiceUsageConfigUpdateAPI
            :<|> SmsServiceConfigUpdateAPI
@@ -45,6 +46,10 @@ type API =
 type MerchantUpdateAPI =
   ApiAuth 'BECKN_TRANSPORT 'WRITE_ACCESS 'MERCHANT
     :> Common.MerchantUpdateAPI
+
+type ServiceUsageConfigAPI =
+  ApiAuth 'BECKN_TRANSPORT 'READ_ACCESS 'MERCHANT
+    :> Common.ServiceUsageConfigAPI
 
 type MapsServiceConfigUpdateAPI =
   ApiAuth 'BECKN_TRANSPORT 'WRITE_ACCESS 'MERCHANT
@@ -65,6 +70,7 @@ type SmsServiceUsageConfigUpdateAPI =
 handler :: ShortId DM.Merchant -> FlowServer API
 handler merchantId =
   merchantUpdate merchantId
+    :<|> serviceUsageConfig merchantId
     :<|> mapsServiceConfigUpdate merchantId
     :<|> mapsServiceUsageConfigUpdate merchantId
     :<|> smsServiceConfigUpdate merchantId
@@ -92,6 +98,14 @@ merchantUpdate merchantShortId apiTokenInfo req = withFlowHandlerAPI $ do
   transaction <- buildTransaction Common.MerchantUpdateEndpoint apiTokenInfo (Just req)
   T.withTransactionStoring transaction $
     Client.callBecknTransportBPP checkedMerchantId (.merchant.merchantUpdate) req
+
+serviceUsageConfig ::
+  ShortId DM.Merchant ->
+  ApiTokenInfo ->
+  FlowHandler Common.ServiceUsageConfigRes
+serviceUsageConfig merchantShortId apiTokenInfo = withFlowHandlerAPI $ do
+  checkedMerchantId <- merchantAccessCheck merchantShortId apiTokenInfo.merchant.shortId
+  Client.callBecknTransportBPP checkedMerchantId (.merchant.serviceUsageConfig)
 
 mapsServiceConfigUpdate ::
   ShortId DM.Merchant ->

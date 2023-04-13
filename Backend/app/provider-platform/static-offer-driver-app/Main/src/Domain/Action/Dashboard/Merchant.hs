@@ -16,6 +16,7 @@ module Domain.Action.Dashboard.Merchant
   ( mapsServiceConfigUpdate,
     mapsServiceUsageConfigUpdate,
     merchantUpdate,
+    serviceUsageConfig,
     smsServiceConfigUpdate,
     smsServiceUsageConfigUpdate,
   )
@@ -26,6 +27,7 @@ import qualified "dashboard-helper-api" Dashboard.ProviderPlatform.Merchant as C
 import qualified Domain.Types.Exophone as DExophone
 import qualified Domain.Types.Merchant as DM
 import qualified Domain.Types.Merchant.MerchantServiceConfig as DMSC
+import qualified Domain.Types.Merchant.MerchantServiceUsageConfig as DMSUC
 import Environment
 import qualified Kernel.External.Maps as Maps
 import qualified Kernel.External.SMS as SMS
@@ -113,6 +115,26 @@ castMerchantStatus = \case
   DM.PENDING_VERIFICATION -> Common.PENDING_VERIFICATION
   DM.APPROVED -> Common.APPROVED
   DM.REJECTED -> Common.REJECTED
+
+---------------------------------------------------------------------
+serviceUsageConfig ::
+  ShortId DM.Merchant ->
+  Flow Common.ServiceUsageConfigRes
+serviceUsageConfig merchantShortId = do
+  merchant <- findMerchantByShortId merchantShortId
+  config <- CQMSUC.findByMerchantId merchant.id >>= fromMaybeM (MerchantServiceUsageConfigNotFound merchant.id.getId)
+  pure $ mkServiceUsageConfigRes config
+
+mkServiceUsageConfigRes :: DMSUC.MerchantServiceUsageConfig -> Common.ServiceUsageConfigRes
+mkServiceUsageConfigRes DMSUC.MerchantServiceUsageConfig {..} =
+  Common.ServiceUsageConfigRes
+    { getEstimatedPickupDistances = Just getEstimatedPickupDistances,
+      getPickupRoutes = Nothing,
+      getTripRoutes = Nothing,
+      whatsappProvidersPriorityList = Nothing,
+      verificationService = Nothing,
+      ..
+    }
 
 ---------------------------------------------------------------------
 mapsServiceConfigUpdate ::

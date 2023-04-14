@@ -386,3 +386,4 @@ getEN script = case script of
   PERMISSION_DENIED -> "Permission Denied"
   PERCENTAGE_OF_NOMINAL_FARE -> "~10% of base fare"
   REQUEST_CALLBACK -> "Request Callback"
+  ERROR_OCCURED_PLEASE_TRY_AGAIN_LATER -> "Error occured please try again later"

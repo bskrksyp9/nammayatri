@@ -385,3 +385,4 @@ getHI script = case script of
   PERMISSION_DENIED -> "अनुमति नहीं दी गई"
   PERCENTAGE_OF_NOMINAL_FARE -> "~ बेस फेयर का 10%"
   REQUEST_CALLBACK -> "कॉलबैक का अनुरोध करें"
+  ERROR_OCCURED_PLEASE_TRY_AGAIN_LATER -> "त्रुटि हुई कृपया बाद में पुन: प्रयास करें"

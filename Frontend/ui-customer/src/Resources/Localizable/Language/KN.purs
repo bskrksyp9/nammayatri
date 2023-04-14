@@ -385,3 +385,4 @@ getKN script = case script of
   PERMISSION_DENIED -> "ಅನುಮತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ"
   PERCENTAGE_OF_NOMINAL_FARE -> "~ ಮೂಲ ದರದ 10%"
   REQUEST_CALLBACK -> "ಕಾಲ್‌ಬ್ಯಾಕ್ ವಿನಂತಿಸಿ"
+  ERROR_OCCURED_PLEASE_TRY_AGAIN_LATER -> "ದೋಷ ಸಂಭವಿಸಿದೆ ದಯವಿಟ್ಟು ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"

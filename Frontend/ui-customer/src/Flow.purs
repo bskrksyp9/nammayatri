@@ -59,7 +59,7 @@ import Screens.ReferralScreen.ScreenData as ReferralScreen
 import Screens.SavedLocationScreen.Controller (getSavedLocationForAddNewAddressScreen)
 import Screens.SelectLanguageScreen.ScreenData as SelectLanguageScreenData
 import Screens.Types (CardType(..), AddNewAddressScreenState(..),CurrentLocationDetails(..), CurrentLocationDetailsWithDistance(..), DeleteStatus(..), HomeScreenState, LocItemType(..), PopupType(..), SearchLocationModelType(..), Stage(..), LocationListItemState, LocationItemType(..), NewContacts, NotifyFlowEventType(..), FlowStatusData(..))
-import Services.API (AddressGeometry(..), BookingLocationAPIEntity(..), ConfirmRes(..), DeleteSavedLocationReq(..), Geometry(..), GetDriverLocationResp(..), GetPlaceNameResp(..), GetProfileRes(..), LatLong(..), LocationS(..), LogOutReq(..), LogOutRes(..), PlaceName(..), ResendOTPResp(..), RideAPIEntity(..), RideBookingAPIDetails(..), RideBookingDetails(..), RideBookingListRes(..), RideBookingRes(..), Route(..), SavedLocationReq(..), SavedLocationsListRes(..), SearchLocationResp(..), SearchRes(..), ServiceabilityRes(..), TriggerOTPResp(..), VerifyTokenResp(..), UserSosRes(..),  GetEmergContactsReq(..), GetEmergContactsResp(..), ContactDetails(..), FlowStatusRes(..), FlowStatus(..), CancelEstimateRes(..))
+import Services.API (AddressGeometry(..), BookingLocationAPIEntity(..), ConfirmRes(..), DeleteSavedLocationReq(..), Geometry(..), GetDriverLocationResp(..), GetPlaceNameResp(..), GetProfileRes(..), LatLong(..), LocationS(..), LogOutReq(..), LogOutRes(..), PlaceName(..), ResendOTPResp(..), RideAPIEntity(..), RideBookingAPIDetails(..), RideBookingDetails(..), RideBookingListRes(..), RideBookingRes(..), Route(..), SavedLocationReq(..), SavedLocationsListRes(..), SearchLocationResp(..), SearchRes(..), ServiceabilityRes(..), TriggerOTPResp(..), VerifyTokenResp(..), UserSosRes(..),  GetEmergContactsReq(..), GetEmergContactsResp(..), ContactDetails(..), FlowStatusRes(..), FlowStatus(..), CancelRes(..), CancelEstimateRes(..))
 import Services.Backend as Remote
 import Storage (KeyStore(..), deleteValueFromLocalStore, getValueToLocalNativeStore, getValueToLocalStore, isLocalStageOn, setValueToLocalNativeStore, setValueToLocalStore, updateLocalStage)
 import Types.App (ABOUT_US_SCREEN_OUTPUT(..), ACCOUNT_SET_UP_SCREEN_OUTPUT(..), ADD_NEW_ADDRESS_SCREEN_OUTPUT(..), GlobalState(..), CONTACT_US_SCREEN_OUTPUT(..), FlowBT, HELP_AND_SUPPORT_SCREEN_OUTPUT(..), HOME_SCREEN_OUTPUT(..), MY_PROFILE_SCREEN_OUTPUT(..), MY_RIDES_SCREEN_OUTPUT(..), PERMISSION_SCREEN_OUTPUT(..), REFERRAL_SCREEN_OUPUT(..), SAVED_LOCATION_SCREEN_OUTPUT(..), SELECT_LANGUAGE_SCREEN_OUTPUT(..), ScreenType(..), TRIP_DETAILS_SCREEN_OUTPUT(..), EMERGECY_CONTACTS_SCREEN_OUTPUT(..))
@@ -593,10 +593,16 @@ homeScreenFlow = do
       _ <- pure $ currentPosition ""
       _ <- pure $ enableMyLocation true
       _ <- updateLocalStage HomeScreen
-      _ <- Remote.cancelRideBT (Remote.makeCancelRequest state) (state.props.bookingId)
-      _ <- pure $ clearWaitingTimer state.props.waitingTimeTimerId
-      _ <- pure $ firebaseLogEvent "ny_user_ride_cancelled_by_user"
-      modifyScreenState $ HomeScreenStateType (\homeScreen -> HomeScreenData.initData)
+      response <- lift $ lift $ Remote.cancelRideBT (Remote.makeCancelRequest state) (state.props.bookingId)
+      case response of 
+        Right (CancelRes resp) -> do 
+          pure $ clearWaitingTimer state.props.waitingTimeTimerId
+          pure $ firebaseLogEvent "ny_user_ride_cancelled_by_user"
+          modifyScreenState $ HomeScreenStateType (\homeScreen -> HomeScreenData.initData)
+        Left err  -> do 
+          _ <- pure $ toast (getString ERROR_OCCURED_PLEASE_TRY_AGAIN_LATER)
+          let newState = state{props{isCancelRide = false}}
+          modifyScreenState $ HomeScreenStateType (\homeScreen -> newState)
       homeScreenFlow
     FCM_NOTIFICATION notification state-> do
         let rideID = state.data.driverInfoCardState.rideId

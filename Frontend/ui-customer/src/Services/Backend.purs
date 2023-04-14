@@ -283,6 +283,7 @@ rideSearchBT payload = do
               else pure $ toast (getString ERROR_OCCURED)
             modifyScreenState $ HomeScreenStateType (\homeScreen -> homeScreen {props{currentStage = SearchLocationModel}})
             _ <- pure $ setValueToLocalStore LOCAL_STAGE "SearchLocationModel"
+            void $ lift $ lift $ toggleLoader false
             BackT $ pure GoBack
 
 
@@ -352,13 +353,11 @@ rideBooking bookingId = do
         unwrapResponse (x) = x
 
 ------------------------------------------------------------------------ CancelRideBT Function ----------------------------------------------------------------------------------------
-cancelRideBT :: CancelReq -> String -> FlowBT String CancelRes
 cancelRideBT payload bookingId = do 
-        headers <- getHeaders' ""
-        withAPIResultBT (EP.cancelRide bookingId) (\x → x) errorHandler (lift $ lift $ callAPI headers (CancelRequest payload bookingId))
+        headers <- getHeaders ""
+        withAPIResult (EP.cancelRide bookingId) unwrapResponse $ callAPI headers (CancelRequest payload bookingId)
     where
-      errorHandler errorPayload = do
-            BackT $ pure GoBack
+        unwrapResponse (x) = x
         
 makeCancelRequest :: HomeScreenState -> CancelReq 
 makeCancelRequest state = CancelReq {

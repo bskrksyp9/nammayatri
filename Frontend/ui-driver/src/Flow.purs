@@ -46,7 +46,7 @@ import Screens.HomeScreen.Controller (activeRideDetail)
 import Screens.HomeScreen.View (rideRequestPollingData)
 import Screens.PopUpScreen.Controller (transformAllocationData)
 import Screens.Types (ActiveRide, AllocationData, HomeScreenStage(..), Location, ReferralType(..))
-import Services.APITypes (DriverActiveInactiveResp(..), DriverArrivedReq(..), DriverDLResp(..), DriverProfileStatsReq(..), DriverProfileStatsResp(..), DriverRCResp(..), DriverRegistrationStatusReq(..), DriverRegistrationStatusResp(..), GetDriverInfoReq(..), GetDriverInfoResp(..), GetRidesHistoryResp(..), GetRouteResp(..), LogOutReq(..), LogOutRes(..), OfferRideResp(..), ReferDriverResp(..), ResendOTPResp(..), RidesInfo(..), Route(..), StartRideResponse(..), Status(..), TriggerOTPResp(..), UpdateDriverInfoResp(..), ValidateImageReq(..), ValidateImageRes(..), Vehicle(..), VerifyTokenResp(..), GetPerformanceReq(..), GetPerformanceRes(..))
+import Services.APITypes (DriverActiveInactiveResp(..), DriverArrivedReq(..), DriverDLResp(..), DriverProfileStatsReq(..), DriverProfileStatsResp(..), DriverRCResp(..), DriverRegistrationStatusReq(..), DriverRegistrationStatusResp(..), GetDriverInfoReq(..), GetDriverInfoResp(..), GetRidesHistoryResp(..), GetRouteResp(..), LogOutReq(..), LogOutRes(..), OfferRideResp(..), ReferDriverResp(..), ResendOTPResp(..), RidesInfo(..), Route(..), StartRideResponse(..), Status(..), TriggerOTPResp(..), UpdateDriverInfoResp(..), ValidateImageReq(..), ValidateImageRes(..), Vehicle(..), VerifyTokenResp(..), GetPerformanceReq(..), GetPerformanceRes(..), EndRideResponse(..))
 import Services.Accessor (_lat, _lon, _id)
 import Services.Backend (makeGetRouteReq, walkCoordinates, walkCoordinate)
 import Services.Backend (makeTriggerOTPReq, makeVerifyOTPReq, makeUpdateDriverInfoReq, makeOfferRideReq, makeDriverRCReq, makeDriverDLReq, makeValidateImageReq, makeReferDriverReq, dummyVehicleObject, driverRegistrationStatusBT, makeUpdateDriverLangChange , makeLinkReferralCodeReq)
@@ -702,33 +702,41 @@ homeScreenFlow = do
       _ <- pure $ printLog "HOME_SCREEN_FLOW GO_TO_END_RIDE" "."
       void $ lift $ lift $ loaderText (getString END_RIDE) ""
       void $ lift $ lift $ toggleLoader true
-      endRideResp <- Remote.endRide id (Remote.makeEndRideReq (fromMaybe 0.0 (fromString lat)) (fromMaybe 0.0 (fromString lon)))-- driver's  lat long during ending ride
-      _ <- pure $ setValueToLocalNativeStore IS_RIDE_ACTIVE  "false"
-      (GetRidesHistoryResp rideHistoryResponse) <- Remote.getRideHistoryReqBT "1" "0" "false"
-      case (head rideHistoryResponse.list) of
-        Nothing -> pure unit
-        Just (RidesInfo response) -> do
-          _ <- pure $ printLog "ride history response" response
-          _ <- pure $ printLog "fromLocation lat" (response.fromLocation ^._lat)
-          modifyScreenState $ RideDetailScreenStateType (\rideDetailScreen -> rideDetailScreen { data {customerName = fromMaybe "" (response.riderName),
-            sourceAddress {
-              place = (decodeAddress response.fromLocation),
-              lat = (response.fromLocation ^._lat),
-              lon = (response.fromLocation ^._lon)
-            },
-            destAddress {
-              place = (decodeAddress response.toLocation),
-              lat = (response.toLocation ^._lat),
-              lon = (response.toLocation ^._lon)
-            },
-            rideStartTime = convertUTCtoISC (fromMaybe " " response.tripStartTime) "h:mm a",
-            rideEndTime = convertUTCtoISC (fromMaybe " " response.tripEndTime) "h:mm a",
-            bookingDateAndTime = convertUTCtoISC response.createdAt  "DD/MM/yyyy  hh:mm a",
-            totalAmount = fromMaybe response.estimatedBaseFare response.computedFare}})
-      void $ lift $ lift $ toggleLoader false
-      _ <- updateStage $ HomeScreenStage RideCompleted
-      rideDetailFlow
-    GO_TO_CANCEL_RIDE {id, info , reason} -> do
+      endRideResp <- lift $ lift $ Remote.endRide id (Remote.makeEndRideReq (fromMaybe 0.0 (fromString lat)) (fromMaybe 0.0 (fromString lon)))-- driver's  lat long during ending ride
+      case endRideResp of
+        Right (EndRideResponse resp) -> do
+          _ <- pure $ setValueToLocalNativeStore IS_RIDE_ACTIVE  "false"
+          (GetRidesHistoryResp rideHistoryResponse) <- Remote.getRideHistoryReqBT "1" "0" "false"
+          case (head rideHistoryResponse.list) of
+            Nothing -> pure unit
+            Just (RidesInfo response) -> do
+              _ <- pure $ printLog "ride history response" response
+              _ <- pure $ printLog "fromLocation lat" (response.fromLocation ^._lat)
+              modifyScreenState $ RideDetailScreenStateType (\rideDetailScreen -> rideDetailScreen { data {customerName = fromMaybe "" (response.riderName),
+                sourceAddress {
+                  place = (decodeAddress response.fromLocation),
+                  lat = (response.fromLocation ^._lat),
+                  lon = (response.fromLocation ^._lon)
+                },
+                destAddress {
+                  place = (decodeAddress response.toLocation),
+                  lat = (response.toLocation ^._lat),
+                  lon = (response.toLocation ^._lon)
+                },
+                rideStartTime = convertUTCtoISC (fromMaybe " " response.tripStartTime) "h:mm a",
+                rideEndTime = convertUTCtoISC (fromMaybe " " response.tripEndTime) "h:mm a",
+                bookingDateAndTime = convertUTCtoISC response.createdAt  "DD/MM/yyyy  hh:mm a",
+                totalAmount = fromMaybe response.estimatedBaseFare response.computedFare}})
+          void $ lift $ lift $ toggleLoader false
+          _ <- updateStage $ HomeScreenStage RideCompleted
+          rideDetailFlow
+        Left errorPayload -> do
+          _ <- pure $ toast $ getString ERROR_OCCURED_PLEASE_TRY_AGAIN_LATER
+          modifyScreenState $ HomeScreenStateType (\homeScreen -> homeScreen { props { endRidePopUp = false } })
+          void $ lift $ lift $ toggleLoader false
+          homeScreenFlow
+      
+    GO_TO_CANCEL_RIDE {id, info , reason} -> do 
       _ <- pure $ printLog "HOME_SCREEN_FLOW GO_TO_CANCEL_RIDE" "."
       cancelRideResp <- Remote.cancelRide id (Remote.makeCancelRideReq info reason)
       _ <- pure $ removeAllPolylines ""

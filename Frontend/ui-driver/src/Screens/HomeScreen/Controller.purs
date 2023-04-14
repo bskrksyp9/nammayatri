@@ -134,6 +134,7 @@ instance loggableAction :: Loggable Action where
     CurrentLocation lat lng -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_screen" "current_location"
     ActiveRideAPIResponseAction resp -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_screen" "active_ride_api_response"
     RecenterButtonAction -> trackAppActionClick appId (getScreen HOME_SCREEN) "in_screen" "recenter_btn"
+    HelpAndSupportScreen -> trackAppActionClick appId (getScreen HOME_SCREEN) "in_screen" "help_and_support_btn"
     NoAction -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_screen" "no_action"
     UpdateMessages msg sender timeStamp -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_screen" "update_messages"
     InitializeChat -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_screen" "initialize_chat"
@@ -147,6 +148,7 @@ instance loggableAction :: Loggable Action where
       ChatView.Call -> trackAppActionClick appId (getScreen HOME_SCREEN) "in_app_messaging" "call_driver"
       ChatView.Navigate -> trackAppActionClick appId (getScreen HOME_SCREEN) "in_app_messaging" "navigate_to_google_maps"
       ChatView.NoAction -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_app_messaging" "no_action"
+      _ -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_screen" "update_in_chat"
     SwitchDriverStatus status -> trackAppScreenEvent appId (getScreen HOME_SCREEN) "in_screen" "SwitchDriverStatus"
     GoToProfile -> do
       trackAppActionClick appId (getScreen HOME_SCREEN) "bottom_nav_bar" "on_navigate"
@@ -167,6 +169,7 @@ instance loggableAction :: Loggable Action where
 data ScreenOutput =   Refresh ST.HomeScreenState
                     | GoToProfileScreen
                     | GoToRidesScreen
+                    | GoToHelpAndSupportScreen
                     | GoToReferralScreen
                     | StartRide ST.HomeScreenState
                     | EndRide ST.HomeScreenState
@@ -211,6 +214,7 @@ data Action = NoAction
             | InitializeChat
             | RemoveChat
             | UpdateInChat
+            | HelpAndSupportScreen
             | SwitchDriverStatus ST.DriverStatus
             | PopUpModalSilentAction PopUpModal.Action
             | GoToProfile
@@ -510,7 +514,7 @@ eval ClickAddAlternateButton state = do
   else do
     exit $ AddAlternateNumber state
 
-
+eval HelpAndSupportScreen state = exit $ GoToHelpAndSupportScreen
 
 eval _ state = continue state
 

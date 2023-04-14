@@ -26,7 +26,6 @@ import Data.Aeson
 import Data.Either (isRight)
 import Data.List.Extra (anySame)
 import Data.OpenApi hiding (description, name, password, url)
-import qualified Kernel.External.Call as Call
 import Kernel.External.Encryption (encrypt)
 import qualified Kernel.External.FCM.Flow as FCM
 import qualified Kernel.External.FCM.Types as FCM
@@ -34,7 +33,6 @@ import qualified Kernel.External.Maps as Maps
 import qualified Kernel.External.SMS as SMS
 import qualified Kernel.External.SMS.ExotelSms.Types as Exotel
 import qualified Kernel.External.Verification as Verification
-import qualified Kernel.External.Whatsapp.Types as Whatsapp
 import Kernel.Prelude
 import Kernel.Storage.Esqueleto (derivePersistField)
 import Kernel.Types.APISuccess (APISuccess)
@@ -496,9 +494,9 @@ type ServiceUsageConfigAPI =
   "serviceUsageConfig"
     :> Get '[JSON] ServiceUsageConfigRes
 
+-- Fields with one possible value (verificationService, initiateCall, whatsappProvidersPriorityList) not included here
 data ServiceUsageConfigRes = ServiceUsageConfigRes
-  { initiateCall :: Call.CallService,
-    getDistances :: Maps.MapsService,
+  { getDistances :: Maps.MapsService,
     getEstimatedPickupDistances :: Maybe Maps.MapsService,
     getRoutes :: Maps.MapsService,
     getPickupRoutes :: Maybe Maps.MapsService,
@@ -508,8 +506,6 @@ data ServiceUsageConfigRes = ServiceUsageConfigRes
     getPlaceDetails :: Maps.MapsService,
     autoComplete :: Maps.MapsService,
     smsProvidersPriorityList :: [SMS.SmsService],
-    whatsappProvidersPriorityList :: Maybe [Whatsapp.WhatsappService],
-    verificationService :: Maybe Verification.VerificationService,
     updatedAt :: UTCTime,
     createdAt :: UTCTime
   }

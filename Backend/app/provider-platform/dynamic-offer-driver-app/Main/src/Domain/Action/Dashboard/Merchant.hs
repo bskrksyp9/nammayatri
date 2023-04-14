@@ -455,8 +455,6 @@ mkServiceUsageConfigRes DMSUC.MerchantServiceUsageConfig {..} =
     { getEstimatedPickupDistances = Just getEstimatedPickupDistances,
       getPickupRoutes = Just getPickupRoutes,
       getTripRoutes = Just getTripRoutes,
-      whatsappProvidersPriorityList = Just whatsappProvidersPriorityList,
-      verificationService = Just verificationService,
       ..
     }
 

@@ -42,6 +42,14 @@ content-type: application/json
 
 ###
 
+# @name merchanServiceUsageConfig
+
+GET {{bpp-dashboard-host}}/bpp/beckn-transport/YATRI_PARTNER/merchant/serviceUsageConfig
+token: {{juspay_admin}}
+content-type: application/json
+
+###
+
 # @name merchantGoogleConfigUpdate
 
 POST {{bpp-dashboard-host}}/bpp/beckn-transport/YATRI_PARTNER/merchant/serviceConfig/maps/update

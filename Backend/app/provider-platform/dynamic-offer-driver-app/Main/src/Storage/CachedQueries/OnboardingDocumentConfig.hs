@@ -56,7 +56,7 @@ makeMerchantIdKey merchantId = "driver-offer:CachedQueries:OnboardingDocumentCon
 
 -- Call it after any update
 clearCache :: Hedis.HedisFlow m r => Id Merchant -> m ()
-clearCache merchantId = Hedis.withCrossAppRedis . Hedis.del $ makeMerchantIdKey merchantId
+clearCache = Hedis.withCrossAppRedis . Hedis.del . makeMerchantIdKey
 
 update :: OnboardingDocumentConfig -> Esq.SqlDB ()
 update = Queries.update

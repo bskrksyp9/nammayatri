@@ -177,7 +177,6 @@ library
       Storage.CachedQueries.Merchant.MerchantServiceUsageConfig
       Storage.Queries.BlackListOrg
       Storage.Queries.Booking
-      Storage.Queries.Booking.BookingLocation
       Storage.Queries.BookingCancellationReason
       Storage.Queries.CallStatus
       Storage.Queries.CancellationReason

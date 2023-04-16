@@ -72,7 +72,7 @@ type API =
     :> Servant.Header "x-bundle-version" Version
     :> Servant.Header "x-client-version" Version
     :> Header "device" Text
-    :> Post '[JSON] SearchRes
+    :> Post '[JSON] (Servant.Headers '[Servant.Header "x-deployment-version" DeploymentVersion] SearchRes)
 
 handler :: FlowServer API
 handler = search
@@ -116,14 +116,22 @@ fareProductConstructorModifier = \case
   "RentalSearch" -> "RENTAL"
   x -> x
 
-search :: Id Person.Person -> SearchReq -> Maybe Version -> Maybe Version -> Maybe Text -> FlowHandler SearchRes
+search ::
+  Id Person.Person ->
+  SearchReq ->
+  Maybe Version ->
+  Maybe Version ->
+  Maybe Text ->
+  FlowHandler (Headers '[Servant.Header "x-deployment-version" DeploymentVersion] SearchRes)
 search personId req mbBundleVersion mbClientVersion device = withFlowHandlerAPI . withPersonIdLogTag personId $ do
   checkSearchRateLimit personId
   updateVersions personId mbBundleVersion mbClientVersion
   (searchId, searchExpiry, routeInfo) <- case req of
     OneWaySearch oneWay -> oneWaySearch personId mbBundleVersion mbClientVersion device oneWay
     RentalSearch rental -> rentalSearch personId mbBundleVersion mbClientVersion device rental
-  return $ SearchRes searchId searchExpiry routeInfo
+  let searchRes = SearchRes searchId searchExpiry routeInfo
+  deploymentVersion <- asks (.version)
+  return $ addHeader deploymentVersion searchRes
 
 oneWaySearch ::
   ( HasCacheConfig r,

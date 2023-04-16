@@ -5,8 +5,7 @@
     flake-parts.follows = "common/flake-parts";
     systems.url = "github:nix-systems/default";
 
-    # Backend inputs
-    shared-kernel.url = "github:nammayatri/shared-kernel";
+    shared-kernel.url = "github:nammayatri/shared-kernel/2d800a9bd774feec05de8714f4d2021351cc1fd7";
     shared-kernel.inputs.nixpkgs.follows = "nixpkgs";
     beckn-gateway.url = "github:nammayatri/beckn-gateway";
     beckn-gateway.inputs.shared-kernel.follows = "shared-kernel";

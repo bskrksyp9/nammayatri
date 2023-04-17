@@ -20,15 +20,19 @@
 
 module Storage.Tabular.BookingCancellationReason where
 
+import qualified Beckn.Types.Core.Taxi.CancellationReasons.Types as SCR
 import qualified Domain.Types.BookingCancellationReason as Domain
 import qualified Domain.Types.CancellationReason as DCR
 import Kernel.Prelude
 import Kernel.Storage.Esqueleto
 import qualified Storage.Tabular.Booking as SRB
-import qualified Storage.Tabular.CancellationReason as SCR
 import qualified Storage.Tabular.Ride as SRide
 
 derivePersistField "Domain.CancellationSource"
+
+derivePersistField "DCR.CancellationStage"
+
+derivePersistField "SCR.CancellationReasonCode"
 
 mkPersist
   defaultSqlSettings
@@ -37,7 +41,7 @@ mkPersist
       bookingId SRB.BookingTId
       rideId SRide.RideTId Maybe
       source Domain.CancellationSource
-      reasonCode SCR.CancellationReasonTId Maybe
+      reasonCode SCR.CancellationReasonCode Maybe
       reasonStage DCR.CancellationStage Maybe
       additionalInfo Text Maybe
       Primary bookingId
@@ -51,7 +55,6 @@ instance FromTType BookingCancellationReasonT Domain.BookingCancellationReason w
       Domain.BookingCancellationReason
         { bookingId = fromKey bookingId,
           rideId = fromKey <$> rideId,
-          reasonCode = fromKey <$> reasonCode,
           ..
         }
 
@@ -60,6 +63,5 @@ instance ToTType BookingCancellationReasonT Domain.BookingCancellationReason whe
     BookingCancellationReasonT
       { bookingId = toKey bookingId,
         rideId = toKey <$> rideId,
-        reasonCode = toKey <$> reasonCode,
         ..
       }

@@ -379,13 +379,11 @@ callDriverBT rideId = do
 
 ------------------------------------------------------------------------ Feedback Function --------------------------------------------------------------------------------------------
 
-rideFeedbackBT :: FeedbackReq -> FlowBT String FeedbackRes
 rideFeedbackBT payload = do 
-    headers <- getHeaders' ""
-    withAPIResultBT (EP.feedback "") (\x → x) errorHandler (lift $ lift $ callAPI headers payload)
+        headers <- getHeaders ""
+        withAPIResult (EP.feedback "") (\x → x)  $ callAPI headers payload
     where
-      errorHandler errorPayload = do
-            BackT $ pure GoBack
+      unwrapResponse (x) = x
 
 makeFeedBackReq :: Int -> String -> String -> FeedbackReq
 makeFeedBackReq rating rideId feedback = FeedbackReq 

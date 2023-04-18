@@ -24,6 +24,7 @@ library
       API
       API.Beckn
       API.Beckn.Cancel
+      API.Beckn.CancellationReasons
       API.Beckn.Confirm
       API.Beckn.Init
       API.Beckn.Rating
@@ -70,6 +71,7 @@ library
       Beckn.ACL.Track
       Beckn.Core
       Domain.Action.Beckn.Cancel
+      Domain.Action.Beckn.CancellationReason
       Domain.Action.Beckn.Confirm
       Domain.Action.Beckn.Init
       Domain.Action.Beckn.OnSearch

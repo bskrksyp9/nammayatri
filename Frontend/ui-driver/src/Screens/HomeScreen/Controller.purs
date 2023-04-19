@@ -568,7 +568,8 @@ activeRideDetail state (RidesInfo ride) = {
   riderName : fromMaybe "" ride.riderName,
   estimatedFare : ride.driverSelectedFare + ride.estimatedBaseFare,
   isDriverArrived : state.data.activeRide.isDriverArrived,
-  notifiedCustomer : if (differenceBetweenTwoUTC ride.updatedAt ride.createdAt) == 0 then false else true
+  notifiedCustomer : if (differenceBetweenTwoUTC ride.updatedAt ride.createdAt) == 0 then false else true,
+  specialZoneTag : ride.specialZoneTag --Just "METRO_PICKUP"
 }
 
 cancellationReasons :: String -> Array CancellationReasons

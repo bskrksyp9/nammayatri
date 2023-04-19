@@ -43,6 +43,7 @@ import Language.Strings (getString)
 import Language.Types(STR(..))
 import Storage (setValueToLocalNativeStore, KeyStore(..))
 import JBridge (firebaseLogEvent)
+import ConfigJBridge (getZoneTagConfig)
 
 instance showAction :: Show Action where 
   show _ = ""
@@ -159,16 +160,11 @@ rideHistoryListTransformer :: Array RidesInfo -> Array ItemState
 rideHistoryListTransformer list = (map (\(RidesInfo ride) -> {
     date : toPropValue (convertUTCtoISC (ride.createdAt) "D MMM"),
     time : toPropValue (convertUTCtoISC (ride.createdAt )"h:mm A"),
-    total_amount : toPropValue (case (ride.status) of 
-                    "CANCELLED" -> 0
-                    _ -> fromMaybe ride.estimatedBaseFare ride.computedFare),
+    total_amount : toPropValue $ fromMaybe ride.estimatedBaseFare ride.computedFare,
     card_visibility : toPropValue "visible",
     shimmer_visibility : toPropValue "gone",
-    rideDistance : toPropValue $ (parseFloat (toNumber (fromMaybe 0 ride.chargeableDistance) / 1000.0) 2) <> " km " <> (getString RIDE),
-    ride_distance_visibility : toPropValue (case (ride.status) of
-                            "CANCELLED" -> "gone"
-                            _ -> "visible"),
-    status :  toPropValue (ride.status),
+    rideDistance : toPropValue $ parseFloat (toNumber (fromMaybe ride.estimatedDistance ride.chargeableDistance) / 1000.0) 2 <> " km with ",
+    status :  toPropValue ride.status,
     vehicleModel : toPropValue ride.vehicleModel ,
     shortRideId : toPropValue ride.shortRideId  ,
     vehicleNumber :  toPropValue ride.vehicleNumber  ,
@@ -182,8 +178,24 @@ rideHistoryListTransformer list = (map (\(RidesInfo ride) -> {
     amountColor: toPropValue (case (ride.status) of
                   "COMPLETED" -> Color.black800
                   "CANCELLED" -> Color.red
-                  _ -> Color.black800)
+                  _ -> Color.black800),
+    riderName : toPropValue $ fromMaybe "" ride.riderName,
+    metroTagVisibility : toPropValue if ride.specialZoneTag == Nothing then "gone" else "visible", -- "visible"
+    specialZoneText : toPropValue $ getSpecialZoneConfig "specialZoneText" ride.specialZoneTag, -- $ Just "METRO_PICKUP"
+    specialZoneImage : toPropValue $ getSpecialZoneConfig "specialZoneImage" ride.specialZoneTag, -- $ Just "METRO_PICKUP"
+    specialZoneLayoutBackground : toPropValue $ getSpecialZoneConfig "specialZoneLayoutBackground" ride.specialZoneTag -- $ Just "METRO_PICKUP"
+
 }) list )
+
+getSpecialZoneConfig :: String -> Maybe String -> String
+getSpecialZoneConfig prop tag = case tag of
+  Just specialZoneTag -> case prop of
+    "specialZoneText" -> (getZoneTagConfig (Just specialZoneTag)).text
+    "specialZoneImage" -> (getZoneTagConfig (Just specialZoneTag)).imageUrl
+    "specialZoneLayoutBackground" -> (getZoneTagConfig (Just specialZoneTag)).backgroundColor
+    _ -> ""
+  Nothing -> ""
+
 
 rideListResponseTransformer :: Array RidesInfo -> Array IndividualRideCardState
 rideListResponseTransformer list = (map (\(RidesInfo ride) -> {

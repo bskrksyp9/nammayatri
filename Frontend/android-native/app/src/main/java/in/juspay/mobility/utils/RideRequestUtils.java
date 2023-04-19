@@ -17,10 +17,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -30,6 +33,8 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -184,6 +189,40 @@ public class RideRequestUtils {
         params.putString(paramKey,paramValue);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
         mFirebaseAnalytics.logEvent(event, params);
+    }
+
+    public JSONObject getZoneConfig(String tag, Context context){
+        try {
+            InputStream is = context.getAssets().open("zone_config.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            String json = new String(buffer, "UTF-8");
+            return new JSONObject(json).getJSONObject(tag);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new JSONObject();
+        }
+    }
+
+    public void setSpecialZoneAttrs(SheetAdapter.SheetViewHolder holder, String specialZoneTag, Context context) {
+        try{
+            JSONObject zoneConfig = getZoneConfig(specialZoneTag,context);
+            holder.specialZoneTag.setCardBackgroundColor(Color.parseColor(zoneConfig.get("backgroundColor").toString()));
+            holder.zoneDot.setCardBackgroundColor(Color.parseColor(zoneConfig.get("textColor").toString()));
+            holder.zoneText.setText(zoneConfig.get("text").toString());
+            holder.zoneText.setTextColor(Color.parseColor(zoneConfig.get("textColor").toString()));
+            holder.fixedFareText.setText("No Cancellation");
+            holder.fixedFareText.setTextColor(Color.parseColor(zoneConfig.get("textColor").toString()));
+            holder.specialZoneTag.setVisibility(View.VISIBLE);
+            holder.assetZonePickup.setImageURI(Uri.parse("android.resource://"+ context.getPackageName() +"/drawable/"+ zoneConfig.get("imageUrl")));
+            holder.assetZoneDrop.setImageURI(Uri.parse("android.resource://"+ context.getPackageName() +"/drawable/"+ zoneConfig.get("imageUrl")));
+            holder.assetZonePickup.setVisibility(zoneConfig.getInt("assetZonePickupVisibility"));
+            holder.assetZoneDrop.setVisibility(zoneConfig.getInt("assetZoneDropVisibility"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 }

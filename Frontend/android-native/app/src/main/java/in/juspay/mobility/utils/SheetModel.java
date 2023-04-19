@@ -9,7 +9,7 @@
 package in.juspay.mobility.utils;
 
 public class SheetModel {
-    private String pickUpDistance, distanceToBeCovered, sourceArea, sourceAddress, destinationArea, destinationAddress, requestId, searchRequestId;
+    private String pickUpDistance, distanceToBeCovered, sourceArea, sourceAddress, destinationArea, destinationAddress, requestId, searchRequestId, specialZoneTag;
     private int baseFare, reqExpiryTime, startTime, updatedAmount, offeredPrice, driverMinExtraFee, driverMaxExtraFee, rideRequestPopupDelayDuration, negotiationUnit, customerExtraFee;
     private float buttonIncreasePriceAlpha , buttonDecreasePriceAlpha;
     private boolean buttonIncreasePriceClickable , buttonDecreasePriceClickable;
@@ -28,9 +28,8 @@ public class SheetModel {
                       int driverMaxExtraFee,
                       int rideRequestPopupDelayDuration,
                       int negotiationUnit,
-                      int customerExtraFee
-    ){
-        this.customerExtraFee = customerExtraFee;
+                      int customerExtraFee,
+                      String specialZoneTag){
         this.pickUpDistance = pickUpDistance;
         this.distanceToBeCovered = distanceToBeCovered;
         this.sourceArea = sourceArea;
@@ -51,6 +50,8 @@ public class SheetModel {
         this.buttonIncreasePriceClickable = true;
         this.buttonDecreasePriceAlpha = 0.5f;
         this.buttonDecreasePriceClickable = false;
+        this.specialZoneTag = specialZoneTag;
+        this.customerExtraFee = customerExtraFee;
     }
 
     public int getOfferedPrice() {
@@ -123,10 +124,6 @@ public class SheetModel {
         this.updatedAmount = updatedAmount;
     }
 
-    public int getDriverMinExtraFee() {
-        return driverMinExtraFee;
-    }
-
     public int getDriverMaxExtraFee() {
         return driverMaxExtraFee;
     }
@@ -137,10 +134,6 @@ public class SheetModel {
 
     public int getNegotiationUnit() {
         return negotiationUnit;
-    }
-
-    public void setNegotiationUnit(int negotiationUnit) {
-        this.negotiationUnit = negotiationUnit;
     }
 
     public float getButtonIncreasePriceAlpha() {
@@ -177,5 +170,9 @@ public class SheetModel {
 
     public void  setCustomerTip(int customerExtraFee){
         this.customerExtraFee = customerExtraFee;
+    }
+
+    public String getSpecialZoneTag() {
+        return specialZoneTag;
     }
 }

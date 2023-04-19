@@ -1,0 +1,42 @@
+{
+  "METRO_PICKUP" : {
+    "backgroundColor" : "#CEDEF8",
+    "text" : "Metro Pickup",
+    "textColor" : "#0066FF",
+    "imageUrl" : "ic_metro_shape",
+    "assetZonePickupVisibility" : 0,
+    "assetZoneDropVisibility" : 8
+  },
+  "METRO_DROP" : {
+    "backgroundColor" : "#CEDEF8",
+    "text" : "Metro Drop",
+    "textColor" : "#0066FF",
+    "imageUrl" : "ic_metro_shape",
+    "assetZonePickupVisibility" : 8,
+    "assetZoneDropVisibility" : 0
+  },
+  "HOSPITAL" : {
+    "backgroundColor" : "#FADFDF",
+    "text" : "Hospital Ride",
+    "textColor" : "#E55454",
+    "imageUrl" : "ic_hospital_ride"
+  },
+  "AIRPORT" : {
+    "backgroundColor" : "",
+    "text" : "",
+    "textColor" : "",
+    "imageUrl" : ""
+  },
+  "SCHOOL" : {
+    "backgroundColor" : "",
+    "text" : "",
+    "textColor" : "",
+    "imageUrl" : ""
+  },
+  "RAILWAY" : {
+    "backgroundColor" : "",
+    "text" : "",
+    "textColor" : "",
+    "imageUrl" : ""
+  }
+}

@@ -402,3 +402,5 @@ getEN script = case script of
   VERIFICATION_IS_TAKING_A_BIT_LONGER -> "Looks like your verification is taking a bit \nlonger than expected.\nYou can contact support to help you out."
   COMPLETE_ONBOARDING -> "Complete Onboarding"
   PERSON_WITH_THIS_NUMBER_ALREADY_EXISTS -> "Person with this mobile number already exists."
+  ZONE_CANCEL_TEXT_DROP -> "Your customer is probably in a rush to reach the metro station on time! \n We urge you not to cancel."
+  ZONE_CANCEL_TEXT_PICKUP -> "Your customer is probably in a rush to reach their destination. \n We urge you not to cancel."

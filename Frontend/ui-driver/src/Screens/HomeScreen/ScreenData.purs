@@ -41,7 +41,8 @@ initData = {
           riderName : "",
           estimatedFare : 0,
           isDriverArrived : false,
-          notifiedCustomer : false
+          notifiedCustomer : false,
+          specialZoneTag : Nothing
         },
         cancelRideModal : {
           cancelRideReasons : [],

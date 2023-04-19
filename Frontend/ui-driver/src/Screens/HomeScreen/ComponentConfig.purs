@@ -15,11 +15,15 @@
 
 module Screens.HomeScreen.ComponentConfig where
 
+import Language.Strings (getString)
+import Prelude(unit, ($), (-), (/), (<), (<=), (<>), (==), (>=), (||))
+import PrestoDOM (Gravity(..), Length(..), Margin(..), Visibility(..))
 import Components.CancelRide as CancelRide
 import Components.PopUpModal as PopUpModal
 import Components.RideActionModal as RideActionModal
 import Components.StatsModel as StatsModel
 import Components.ChatView as ChatView
+import ConfigJBridge (getZoneTagConfig)
 import Data.Array as DA
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String as DS
@@ -29,8 +33,6 @@ import Helpers.Utils as HU
 import Components.InAppKeyboardModal as InAppKeyboardModal
 import Language.Strings
 import Language.Types (STR(..))
-import Prelude
-import PrestoDOM
 import PrestoDOM.Types.DomAttributes as PTD
 import Screens.Types as ST
 import Styles.Colors as Color
@@ -60,7 +62,8 @@ rideActionModalConfig state = let
     isDriverArrived = state.data.activeRide.isDriverArrived,
     notifiedCustomer = state.data.activeRide.notifiedCustomer,
     currentStage = state.props.currentStage,
-    unReadMessages = state.props.unReadMessages
+    unReadMessages = state.props.unReadMessages,
+    specialZoneTag = state.data.activeRide.specialZoneTag
   }
   in rideActionModalConfig'
 
@@ -127,7 +130,9 @@ cancelConfirmationConfig state = let
     margin = MarginHorizontal 24 24 ,
     buttonLayoutMargin = Margin 16 0 16 20 ,
     primaryText {
-      text = (getString FREQUENT_CANCELLATIONS_WILL_LEAD_TO_LESS_RIDES)
+      text = case state.data.activeRide.specialZoneTag of 
+              Nothing -> getString FREQUENT_CANCELLATIONS_WILL_LEAD_TO_LESS_RIDES
+              Just specialZoneTag -> getString $ getCancelAlertText $ (getZoneTagConfig state.data.activeRide.specialZoneTag).cancelText
     , margin = Margin 16 24 16 24 },
     secondaryText {visibility = GONE},
     option1 {
@@ -153,7 +158,8 @@ cancelConfirmationConfig state = let
     backgroundClickable = false,
     cornerRadius = (PTD.Corners 15.0 true true true true),
     coverImageConfig {
-      imageUrl = "ny_ic_cancel_prevention,https://assets.juspay.in/nammayatri/images/driver/ny_ic_cancel_prevention.png"
+      imageUrl = if state.data.activeRide.specialZoneTag == Nothing then "ny_ic_cancel_prevention,https://assets.juspay.in/nammayatri/images/driver/ny_ic_cancel_prevention.png" 
+                  else (getZoneTagConfig (state.data.activeRide.specialZoneTag)).cancelConfirmImage
     , visibility = VISIBLE
     , margin = Margin 16 20 16 0
     , height = V 178
@@ -267,3 +273,8 @@ enterOtpStateConfig state = let
       modalType = ST.OTP
       }
       in inAppModalConfig'
+getCancelAlertText :: String -> STR
+getCancelAlertText key = case key of 
+  "ZONE_CANCEL_TEXT_PICKUP" -> ZONE_CANCEL_TEXT_PICKUP
+  "ZONE_CANCEL_TEXT_DROP" -> ZONE_CANCEL_TEXT_DROP
+  _ -> FREQUENT_CANCELLATIONS_WILL_LEAD_TO_LESS_RIDES

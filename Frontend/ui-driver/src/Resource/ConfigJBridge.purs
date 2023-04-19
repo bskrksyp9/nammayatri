@@ -15,5 +15,19 @@
 
 module ConfigJBridge where
 
+import Data.Maybe (Maybe(..), fromMaybe)
+
 foreign import getKeyInSharedPrefKeysConfig :: String -> String
 foreign import getValueToLocalNativeStoreConfig :: String -> String
+foreign import getZoneTagConfig' :: String -> ZoneConfig
+
+getZoneTagConfig :: Maybe String -> ZoneConfig
+getZoneTagConfig key = getZoneTagConfig' (fromMaybe "" key)
+
+type ZoneConfig = {
+  backgroundColor :: String,
+  text :: String,
+  imageUrl :: String,
+  cancelText :: String,
+  cancelConfirmImage :: String
+}

@@ -86,7 +86,8 @@ view rideListItem push state =
         , width MATCH_PARENT
         , orientation VERTICAL
         , weight 1.0
-        ][ headerView push state
+        , background Color.white900
+        ][  headerView push state
           , separatorView 
           , ridesView rideListItem push state 
           ]
@@ -126,7 +127,7 @@ headerView push state =
     , width MATCH_PARENT
     , orientation VERTICAL
     , gravity CENTER
-    , margin (MarginTop 30)
+    , margin $ MarginTop 20
     ][ textView
         [ text (getString RIDES)
         , gravity CENTER_VERTICAL
@@ -284,7 +285,6 @@ shimmerData i = {
   total_amount : toPropValue "₹ 0.0",
   card_visibility : toPropValue "gone",
   shimmer_visibility : toPropValue "visible",
-  ride_distance_visibility : toPropValue "visible",
   rideDistance : toPropValue "10km Ride with Bharat",
   status :  toPropValue "",
   vehicleModel : toPropValue "Auto",
@@ -297,5 +297,10 @@ shimmerData i = {
   updatedAt : toPropValue "",
   source : toPropValue "Nagarjuna Apartments,15/2, 19th Main, 27th Cross Rd, Sector 2, HSR Layout, Bengaluru, Karnataka 560102",
   destination : toPropValue "Nagarjuna Apartments,15/2, 19th Main, 27th Cross Rd, Sector 2, HSR Layout, Bengaluru, Karnataka 560102",
-  amountColor: toPropValue ""
+  amountColor: toPropValue "",
+  riderName : toPropValue "",
+  metroTagVisibility : toPropValue "",
+  specialZoneText : toPropValue "",
+  specialZoneImage : toPropValue "",
+  specialZoneLayoutBackground : toPropValue ""
 }

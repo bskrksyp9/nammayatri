@@ -21,13 +21,13 @@ module API.UI.Booking
   )
 where
 
+import Beckn.Types.Core.Taxi.CancellationReasons.Types
 import qualified Domain.Action.UI.Booking as DBooking
 import Domain.Types.Booking (BookingAPIEntity)
 import qualified Domain.Types.Booking as SRB
 import qualified Domain.Types.Person as Person
 import Environment
 import EulerHS.Prelude hiding (id)
-import Kernel.Prelude
 import Kernel.Types.Id
 import Kernel.Utils.Common
 import Servant
@@ -38,10 +38,10 @@ type API =
     :> ( Capture "rideBookingId" (Id SRB.Booking)
            :> TokenAuth
            :> Post '[JSON] BookingAPIEntity
-           {-}:<|> Capture "rideBookingId" (Id SRB.Booking)
+           :<|> Capture "rideBookingId" (Id SRB.Booking)
              :> "cancellationReasons"
              :> TokenAuth
-             :> Get '[JSON] CancellationReasonAPIEntity-}
+             :> Get '[JSON] CancellationReasonsRes
            :<|> "list"
              :> TokenAuth
              :> QueryParam "limit" Integer
@@ -54,7 +54,7 @@ type API =
 handler :: FlowServer API
 handler =
   bookingStatus
-    -- :<|> bookingCancellationReasons
+    :<|> bookingCancellationReasons
     :<|> bookingList
 
 bookingStatus :: Id SRB.Booking -> Id Person.Person -> FlowHandler BookingAPIEntity
@@ -63,7 +63,5 @@ bookingStatus bookingId = withFlowHandlerAPI . DBooking.bookingStatus bookingId
 bookingList :: Id Person.Person -> Maybe Integer -> Maybe Integer -> Maybe Bool -> Maybe SRB.BookingStatus -> FlowHandler DBooking.BookingListRes
 bookingList personId mbLimit mbOffset mbOnlyActive = withFlowHandlerAPI . DBooking.bookingList personId mbLimit mbOffset mbOnlyActive
 
-data CancellationReasonAPIEntity = CancellationReasonAPIEntity {a :: Text, b :: Text} deriving (Show, Eq, Generic, FromJSON, ToJSON, ToSchema)
-
-bookingCancellationReasons :: Id SRB.Booking -> Id Person.Person -> FlowHandler CancellationReasonAPIEntity
-bookingCancellationReasons _ _ = withFlowHandlerAPI $ return $ CancellationReasonAPIEntity "1" "2"
+bookingCancellationReasons :: Id SRB.Booking -> Id Person.Person -> FlowHandler CancellationReasonsRes
+bookingCancellationReasons bookingId _ = withFlowHandlerAPI $ DBooking.getBookingCancellationReason bookingId

@@ -21,7 +21,6 @@ where
 import qualified API.UI.Booking as Booking
 import qualified API.UI.Call as Call
 import qualified API.UI.Cancel as Cancel
-import qualified API.UI.CancellationReason as CancellationReason
 import qualified API.UI.Confirm as Confirm
 import qualified API.UI.CustomerSupport as CustomerSupport
 import qualified API.UI.Feedback as Feedback
@@ -66,7 +65,6 @@ type API =
            :<|> CustomerSupport.API
            :<|> MapsProxy.API
            :<|> GoogleTranslateProxy.API
-           :<|> CancellationReason.API
            :<|> SavedReqLocation.API
            :<|> Webengage.API
            :<|> InfoBIPWebhook.API
@@ -95,7 +93,6 @@ handler =
     :<|> CustomerSupport.handler
     :<|> MapsProxy.handler
     :<|> GoogleTranslateProxy.handler
-    :<|> CancellationReason.handler
     :<|> SavedReqLocation.handler
     :<|> Webengage.handler
     :<|> InfoBIPWebhook.handler

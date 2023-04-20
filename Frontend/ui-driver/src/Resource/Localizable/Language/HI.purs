@@ -318,7 +318,7 @@ getHI script = case script of
   ALL_ALERTS -> "सभी अलर्टस"
   ALL_MESSAGES -> "सभी संदेश"
   MESSAGES -> "संदेशों"
-  MESSAGE -> "संदेश"
+  ALERT_MESSAGE -> "संदेश"
   ADD_A_COMMENT -> "एक टिप्पणी जोड़ने"
   POST_COMMENT -> "टिप्पणी करें"
   ENTER_YOUR_COMMENT -> "अपनी टिप्पणी दर्ज करें"

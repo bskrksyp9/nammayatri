@@ -319,7 +319,7 @@ getTA script = case script of
   ALL_ALERTS -> "அனைத்து அறிவிப்புகள்"
   ALL_MESSAGES -> "அனைத்து செய்திகளும்"
   MESSAGES -> "செய்திகள்"
-  MESSAGE -> "செய்தி"
+  ALERT_MESSAGE -> "செய்தி"
   ADD_A_COMMENT -> "கருத்தைச் சேர்"
   POST_COMMENT -> "கருத்து பதிவு"
   ENTER_YOUR_COMMENT -> "உங்கள் கருத்தை உள்ளிடவும்"

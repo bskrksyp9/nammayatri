@@ -1960,40 +1960,27 @@ public class CommonJsInterface extends JBridge implements in.juspay.hypersdk.cor
     @JavascriptInterface
     public void setScaleType (String id, String imageUrl, String scaleType){
         if (activity == null) return;
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (id != null || imageUrl != null){
-                    ImageView imageView = activity.findViewById(Integer.parseInt(id));
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                URL url = new URL(imageUrl);
-                                Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                                Handler mainLooper = new Handler(Looper.getMainLooper());
-                                mainLooper.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (bitmap == null) return;
-                                        int tempWidth = Math.min(bitmap.getWidth(), getScreenWidth());
-                                        imageView.getLayoutParams().height =  (tempWidth * (getScreenHeight()/getScreenWidth()));
-                                        imageView.setScaleType(getScaleTypes(scaleType));
-                                        imageView.setImageBitmap(bitmap);
-                                        LinearLayout linearLayout = (LinearLayout) imageView.getParent();
-                                        linearLayout.removeAllViews();
-                                        linearLayout.addView(imageView);
-                                        imageView.setVisibility(View.VISIBLE);
-                                    }
-                                });
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }).start();
-                }
+        if (id != null || imageUrl != null){
+            ImageView imageView = activity.findViewById(Integer.parseInt(id));
+            try {
+                URL url = new URL(imageUrl);
+                Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                Handler mainLooper = new Handler(Looper.getMainLooper());
+                mainLooper.post(() -> {
+                    if (bitmap == null) return;
+                    int tempWidth = Math.min(bitmap.getWidth(), getScreenWidth());
+                    imageView.getLayoutParams().height =  (tempWidth * (getScreenHeight()/getScreenWidth()));
+                    imageView.setScaleType(getScaleTypes(scaleType));
+                    imageView.setImageBitmap(bitmap);
+                    LinearLayout linearLayout = (LinearLayout) imageView.getParent();
+                    linearLayout.removeAllViews();
+                    linearLayout.addView(imageView);
+                    imageView.setVisibility(View.VISIBLE);
+                });
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-        });
+        }
     }
 
     public ImageView.ScaleType getScaleTypes(String scale){

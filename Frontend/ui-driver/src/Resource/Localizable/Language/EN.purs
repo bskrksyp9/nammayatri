@@ -321,7 +321,7 @@ getEN script = case script of
   ALL_ALERTS -> "All Alerts"
   ALL_MESSAGES -> "All Messages"
   MESSAGES -> "Messages"
-  MESSAGE -> "Message"
+  ALERT_MESSAGE -> "Message"
   ADD_A_COMMENT -> "Add a comment"
   POST_COMMENT -> "Post Comment"
   ENTER_YOUR_COMMENT -> "Enter your comment"

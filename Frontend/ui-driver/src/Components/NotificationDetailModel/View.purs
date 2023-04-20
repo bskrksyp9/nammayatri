@@ -271,7 +271,7 @@ headerLayout state push =
         , textView
             $ [ width WRAP_CONTENT
               , height WRAP_CONTENT
-              , text $ getString MESSAGE
+              , text $ getString ALERT_MESSAGE
               , textSize FontSize.a_18
               , margin $ MarginLeft 20
               , weight 1.0

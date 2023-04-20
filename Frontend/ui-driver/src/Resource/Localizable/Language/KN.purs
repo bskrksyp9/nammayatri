@@ -318,7 +318,7 @@ getKN script = case script of
   ALL_ALERTS -> "ಎಲ್ಲಾ ಘೋಷಣೆ"
   ALL_MESSAGES -> "ಎಲ್ಲಾ ಸಂದೇಶಗಳು"
   MESSAGES -> "ಸಂದೇಶಗಳು"
-  MESSAGE -> "ಸಂದೇಶ"
+  ALERT_MESSAGE -> "ಸಂದೇಶ"
   ADD_A_COMMENT -> "ಕಾಮೆಂಟ್ ಸೇರಿಸಿ"
   POST_COMMENT -> "ಕಾಮೆಂಟ್ ಪೋಸ್ಟ್ ಮಾಡಿ"
   ENTER_YOUR_COMMENT -> "ನಿಮ್ಮ ಕಾಮೆಂಟ್ ಅನ್ನು ನಮೂದಿಸಿ"

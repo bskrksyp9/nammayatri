@@ -314,7 +314,7 @@ data STR = LETS_GET_STARTED
         | ALL_ALERTS
         | ALL_MESSAGES
         | MESSAGES
-        | MESSAGE
+        | ALERT_MESSAGE
         | ADD_A_COMMENT
         | POST_COMMENT
         | ENTER_YOUR_COMMENT
@@ -725,7 +725,7 @@ type ALERT = String
 type ALL_ALERTS = String
 type ALL_MESSAGES = String
 type MESSAGES = String
-type MESSAGE = String
+type ALERT_MESSAGE = String
 type ADD_A_COMMENT = String
 type POST_COMMENT = String
 type ENTER_YOUR_COMMENT = String

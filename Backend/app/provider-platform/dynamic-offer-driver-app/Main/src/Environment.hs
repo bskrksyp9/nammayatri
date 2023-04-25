@@ -82,6 +82,7 @@ data AppCfg = AppCfg
     dashboardToken :: Text,
     cacheConfig :: CacheConfig,
     metricsSearchDurationTimeout :: Seconds,
+    metricsSelectDurationTimeout :: Seconds,
     driverLocationUpdateRateLimitOptions :: APIRateLimitOptions,
     driverReachedDistance :: HighPrecMeters,
     cacheTranslationConfig :: CacheTranslationConfig,
@@ -162,7 +163,7 @@ buildAppEnv cfg@AppCfg {..} = do
   esqDBReplicaEnv <- prepareEsqDBEnv esqDBReplicaCfg loggerEnv
   let modifierFunc = ("dynamic-offer-driver-app:" <>)
   hedisEnv <- connectHedis hedisCfg modifierFunc
-  bppMetrics <- registerBPPMetricsContainer metricsSearchDurationTimeout
+  bppMetrics <- registerBPPMetricsContainer metricsSearchDurationTimeout metricsSelectDurationTimeout
   ssrMetrics <- registerSendSearchRequestToDriverMetricsContainer
   coreMetrics <- Metrics.registerCoreMetricsContainer
   clickhouseEnv <- createConn clickhouseCfg

@@ -114,6 +114,7 @@ in  { esqDBCfg
     , dashboardToken = sec.dashboardToken
     , cacheConfig
     , metricsSearchDurationTimeout = +45
+    , metricsSelectDurationTimeout = +45
     , driverLocationUpdateRateLimitOptions
     , driverReachedDistance = +100
     , cacheTranslationConfig

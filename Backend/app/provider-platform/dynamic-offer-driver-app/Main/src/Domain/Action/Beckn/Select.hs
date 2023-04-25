@@ -50,6 +50,7 @@ import qualified Storage.Queries.Estimate as QEst
 import qualified Storage.Queries.SearchRequest as QSReq
 import Tools.Error
 import Tools.Maps as Maps
+import qualified Tools.Metrics.ARDUBPPMetrics as Metrics
 
 data DSelectReq = DSelectReq
   { messageId :: Text,
@@ -61,7 +62,7 @@ data DSelectReq = DSelectReq
     pickupTime :: UTCTime,
     dropLocation :: LatLong,
     pickupAddress :: Maybe BA.Address,
-    dropAddrress :: Maybe BA.Address,
+    dropAddress :: Maybe BA.Address,
     autoAssignEnabled :: Bool,
     customerLanguage :: Maybe Maps.Language,
     customerExtraFee :: Maybe Money
@@ -71,10 +72,11 @@ type LanguageDictionary = M.Map Maps.Language DSearchReq.SearchRequest
 
 handler :: Id DM.Merchant -> DSelectReq -> Flow ()
 handler merchantId sReq = do
-  sessiontoken <- generateGUIDText
   merchant <- QMerch.findById merchantId >>= fromMaybeM (MerchantNotFound merchantId.getId)
+  selectMetricsMVar <- Metrics.startSelectMetrics merchant.name
+  sessiontoken <- generateGUIDText
   fromLocation <- buildSearchReqLocation merchantId sessiontoken sReq.pickupAddress sReq.customerLanguage sReq.pickupLocation
-  toLocation <- buildSearchReqLocation merchantId sessiontoken sReq.dropAddrress sReq.customerLanguage sReq.dropLocation
+  toLocation <- buildSearchReqLocation merchantId sessiontoken sReq.dropAddress sReq.customerLanguage sReq.dropLocation
   mbDistRes <- CD.getCacheDistance sReq.transactionId
   estimate <- QEst.findById sReq.estimateId >>= fromMaybeM (EstimateDoesNotExist sReq.estimateId.getId)
   logInfo $ "Fetching cached distance and duration" <> show mbDistRes
@@ -92,7 +94,7 @@ handler merchantId sReq = do
       Just distRes -> pure distRes
   (fareParams, driverExtraFare) <- case merchant.farePolicyType of
     DFareParams.SLAB -> do
-      slabFarePolicy <- SFarePolicyS.findByMerchantIdAndVariant merchant.id estimate.vehicleVariant >>= fromMaybeM (InternalError "Slab fare policy not found")
+      slabFarePolicy <- SFarePolicyS.findByMerchantIdAndVariant merchantId estimate.vehicleVariant >>= fromMaybeM (InternalError "Slab fare policy not found")
       let driverExtraFare = DFarePolicy.ExtraFee {minFee = 0, maxFee = 0}
       fareParams <- calculateFare merchantId (Right slabFarePolicy) distance sReq.pickupTime Nothing sReq.customerExtraFee
       pure (fareParams, driverExtraFare)
@@ -129,6 +131,7 @@ handler merchantId sReq = do
               driverMaxExtraFee = driverExtraFare.maxFee
             }
     _ -> return ()
+  Metrics.finishSelectMetrics merchant.name selectMetricsMVar
 
 buildSearchRequest ::
   ( MonadTime m,

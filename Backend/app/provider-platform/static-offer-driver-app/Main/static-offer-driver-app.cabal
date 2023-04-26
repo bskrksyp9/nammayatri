@@ -25,6 +25,7 @@ library
       API.Beckn
       API.Beckn.Cancel
       API.Beckn.Confirm
+      API.Beckn.GetRatingCategories
       API.Beckn.Init
       API.Beckn.Rating
       API.Beckn.Search
@@ -59,6 +60,7 @@ library
       App.Server
       Beckn.ACL.Cancel
       Beckn.ACL.Confirm
+      Beckn.ACL.GetRatingCategories
       Beckn.ACL.Init
       Beckn.ACL.OnConfirm
       Beckn.ACL.OnInit
@@ -140,6 +142,7 @@ library
       Domain.Types.Person
       Domain.Types.Quote
       Domain.Types.Rating
+      Domain.Types.RatingCategories
       Domain.Types.RegistrationToken
       Domain.Types.Ride
       Domain.Types.RideDetails
@@ -211,6 +214,7 @@ library
       Storage.Queries.Quote.OneWayQuote
       Storage.Queries.Quote.RentalQuote
       Storage.Queries.Rating
+      Storage.Queries.RatingCategories
       Storage.Queries.RegistrationToken
       Storage.Queries.Ride
       Storage.Queries.RideDetails
@@ -256,6 +260,7 @@ library
       Storage.Tabular.Quote.RentalQuote
       Storage.Tabular.Quote.Table
       Storage.Tabular.Rating
+      Storage.Tabular.RatingCategories
       Storage.Tabular.RegistrationToken
       Storage.Tabular.Ride
       Storage.Tabular.Ride.Instances

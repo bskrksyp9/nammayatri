@@ -12,35 +12,28 @@
  the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module API.Beckn (API, handler) where
+module API.Beckn.GetRatingCategories (API, handler) where
 
-import qualified API.Beckn.Cancel as Cancel
-import qualified API.Beckn.Confirm as Confirm
-import qualified API.Beckn.GetRatingCategories as GetRatingCategories
-import qualified API.Beckn.Init as Init
-import qualified API.Beckn.Rating as Rating
-import qualified API.Beckn.Search as Search
-import qualified API.Beckn.Track as Track
+import qualified Beckn.ACL.GetRatingCategories as ACL
+import qualified Beckn.Types.Core.Taxi.API.Rating as Rating
 import Environment
+import EulerHS.Prelude hiding (id)
+import Kernel.Utils.Common
+import Kernel.Utils.Servant.SignatureAuth
 import Servant
 
 type API =
-  "v1"
-    :> ( Search.API
-           :<|> Init.API
-           :<|> Confirm.API
-           :<|> Cancel.API
-           :<|> Rating.API
-           :<|> Track.API
-           :<|> GetRatingCategories.API
-       )
+  SignatureAuth "Authorization"
+    :> Rating.GetRatingCategoriesAPI
 
 handler :: FlowServer API
-handler =
-  Search.handler
-    :<|> Init.handler
-    :<|> Confirm.handler
-    :<|> Cancel.handler
-    :<|> Rating.handler
-    :<|> Track.handler
-    :<|> GetRatingCategories.handler
+handler = getRatingCategories
+
+getRatingCategories ::
+  SignatureAuthResult ->
+  Rating.GetRatingCategoriesReq ->
+  FlowHandler Rating.GetRatingCategoriesResp
+getRatingCategories (SignatureAuthResult _ subscriber) req = withFlowHandlerAPI $
+  withTransactionIdLogTag req $ do
+    logTagInfo "getRatingCategoriesAPI" "Received get_rating_categories API call."
+    ACL.buildRatingCategoriesResp subscriber req

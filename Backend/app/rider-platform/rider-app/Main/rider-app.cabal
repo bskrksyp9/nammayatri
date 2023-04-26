@@ -60,6 +60,7 @@ library
       API.UI.Maps
       API.UI.Profile
       API.UI.Quote
+      API.UI.RatingCategories
       API.UI.Registration
       API.UI.Ride
       API.UI.Route
@@ -111,6 +112,7 @@ library
       Domain.Action.UI.CustomerSupport
       Domain.Action.UI.Feedback
       Domain.Action.UI.Frontend
+      Domain.Action.UI.GetRatingCategories
       Domain.Action.UI.Maps
       Domain.Action.UI.Profile
       Domain.Action.UI.Quote
@@ -170,6 +172,7 @@ library
       SharedLogic.CallBPP
       SharedLogic.CallBPPInternal
       SharedLogic.Confirm
+      SharedLogic.GetRatingCategories
       SharedLogic.GoogleTranslate
       SharedLogic.Merchant
       SharedLogic.MessageBuilder

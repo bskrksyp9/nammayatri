@@ -30,6 +30,7 @@ import qualified API.UI.GoogleTranslate as GoogleTranslateProxy
 import qualified API.UI.Maps as MapsProxy
 import qualified API.UI.Profile as Profile
 import qualified API.UI.Quote as Quote
+import qualified API.UI.RatingCategories as RatingCategories
 import qualified API.UI.Registration as Registration
 import qualified API.UI.Ride as Ride
 import qualified API.UI.Route as Route
@@ -73,6 +74,7 @@ type API =
            :<|> Frontend.API
            :<|> Whatsapp.API
            :<|> Sos.API
+           :<|> RatingCategories.API
        )
 
 handler :: FlowServer API
@@ -102,3 +104,4 @@ handler =
     :<|> Frontend.handler
     :<|> Whatsapp.handler
     :<|> Sos.handler
+    :<|> RatingCategories.handler

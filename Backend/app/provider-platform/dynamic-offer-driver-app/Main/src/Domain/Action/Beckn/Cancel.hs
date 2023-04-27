@@ -111,6 +111,7 @@ cancel merchantId _ req = do
         DBCR.BookingCancellationReason
           { bookingId = req.bookingId,
             rideId = Nothing,
+            merchantId = merchantId,
             source = DBCR.ByUser,
             reasonCode = Nothing,
             driverId = Nothing,

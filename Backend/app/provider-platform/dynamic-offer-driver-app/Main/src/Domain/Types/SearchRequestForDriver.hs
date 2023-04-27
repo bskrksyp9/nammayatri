@@ -16,6 +16,7 @@
 module Domain.Types.SearchRequestForDriver where
 
 import qualified Domain.Types.DriverInformation as DI
+import qualified Domain.Types.Merchant as DM
 import Domain.Types.Person
 import Domain.Types.SearchRequest
 import qualified Domain.Types.SearchRequest as DSReq
@@ -42,6 +43,7 @@ data SearchRequestForDriver = SearchRequestForDriver
   { id :: Id SearchRequestForDriver,
     transactionId :: Text,
     searchRequestId :: Id SearchRequest,
+    merchantId :: Id DM.Merchant,
     startTime :: UTCTime,
     searchRequestValidTill :: UTCTime,
     driverId :: Id Person,

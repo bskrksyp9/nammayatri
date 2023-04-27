@@ -82,7 +82,7 @@ cancel bookingId _ req = do
     throwError $ RideInvalidStatus "Cannot cancel this ride"
   when (booking.status == SRB.NEW) $ throwError (BookingInvalidStatus "NEW")
   bppBookingId <- fromMaybeM (BookingFieldNotPresent "bppBookingId") booking.bppBookingId
-  cancellationReason <- buildBookingCancelationReason
+  cancellationReason <- buildBookingCancelationReason (booking.merchantId)
   DB.runTransaction $ QBCR.upsert cancellationReason
   return $
     CancelRes
@@ -94,12 +94,13 @@ cancel bookingId _ req = do
         city = merchant.city
       }
   where
-    buildBookingCancelationReason = do
+    buildBookingCancelationReason merchantId = do
       let CancelReq {..} = req
       return $
         SBCR.BookingCancellationReason
           { bookingId = bookingId,
             rideId = Nothing,
+            merchantId = merchantId,
             source = SBCR.ByUser,
             reasonCode = Just reasonCode,
             reasonStage = Just reasonStage,

@@ -212,6 +212,7 @@ handler subscriber transporterId req = do
           { id = guid,
             bookingId = booking.id,
             shortId = shortId,
+            merchantId = booking.providerId,
             status = DRide.NEW,
             driverId = cast driverId,
             otp = otp,
@@ -314,8 +315,8 @@ cancelBooking booking mbDriver transporter = do
   unless (transporterId' == transporter.id) $ throwError AccessDenied
   mbRide <- QRide.findActiveByRBId booking.id
   bookingCancellationReason <- case mbDriver of
-    Nothing -> buildBookingCancellationReason booking.id Nothing mbRide
-    Just driver -> buildBookingCancellationReason booking.id (Just driver.id) mbRide
+    Nothing -> buildBookingCancellationReason booking.id Nothing mbRide transporterId'
+    Just driver -> buildBookingCancellationReason booking.id (Just driver.id) mbRide transporterId'
   Esq.runTransaction $ do
     QRB.updateStatus booking.id DRB.CANCELLED
     QBCR.upsert bookingCancellationReason
@@ -335,12 +336,13 @@ cancelBooking booking mbDriver transporter = do
         fork "cancelRide - Notify driver" $ do
           Notify.notifyOnCancel transporter.id booking driver.id driver.deviceToken bookingCancellationReason.source
   where
-    buildBookingCancellationReason bookingId driverId ride = do
+    buildBookingCancellationReason bookingId driverId ride merchantId = do
       return $
         DBCR.BookingCancellationReason
           { driverId = driverId,
             bookingId,
             rideId = (.id) <$> ride,
+            merchantId = merchantId,
             source = DBCR.ByApplication,
             reasonCode = Nothing,
             additionalInfo = Nothing

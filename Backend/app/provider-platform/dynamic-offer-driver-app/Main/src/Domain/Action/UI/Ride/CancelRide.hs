@@ -86,27 +86,29 @@ cancelRideHandler ServiceHandle {..} requestorId rideId req = withLogTag ("rideI
           driver <- findById driverId >>= fromMaybeM (PersonNotFound driverId.getId)
           unless (authPerson.merchantId == driver.merchantId) $ throwError (RideDoesNotExist rideId.getId)
           logTagInfo "admin -> cancelRide : " ("DriverId " <> getId driverId <> ", RideId " <> getId ride.id)
-          buildRideCancelationReason Nothing DBCR.ByMerchant ride
+          buildRideCancelationReason Nothing DBCR.ByMerchant ride (driver.merchantId)
         DP.DRIVER -> do
+          driver <- findById driverId >>= fromMaybeM (PersonNotFound driverId.getId)
           unless (authPerson.id == driverId) $ throwError NotAnExecutor
           logTagInfo "driver -> cancelRide : " ("DriverId " <> getId driverId <> ", RideId " <> getId ride.id)
-          buildRideCancelationReason (Just driverId) DBCR.ByDriver ride
+          buildRideCancelationReason (Just driverId) DBCR.ByDriver ride (driver.merchantId)
     DashboardRequestorId reqMerchantId -> do
       driver <- findById driverId >>= fromMaybeM (PersonNotFound driverId.getId)
       unless (driver.merchantId == reqMerchantId) $ throwError (RideDoesNotExist rideId.getId)
       logTagInfo "dashboard -> cancelRide : " ("DriverId " <> getId driverId <> ", RideId " <> getId ride.id)
-      buildRideCancelationReason Nothing DBCR.ByMerchant ride -- is it correct DBCR.ByMerchant?
+      buildRideCancelationReason Nothing DBCR.ByMerchant ride (driver.merchantId) -- is it correct DBCR.ByMerchant?
   cancelRide rideId rideCancelationReason
   pure APISuccess.Success
   where
     isValidRide ride =
       ride.status == DRide.NEW
-    buildRideCancelationReason mbDriverId source ride = do
+    buildRideCancelationReason mbDriverId source ride merchantId = do
       let CancelRideReq {..} = req
       return $
         DBCR.BookingCancellationReason
           { bookingId = ride.bookingId,
             rideId = Just ride.id,
+            merchantId = merchantId,
             source = source,
             reasonCode = Just reasonCode,
             driverId = mbDriverId,

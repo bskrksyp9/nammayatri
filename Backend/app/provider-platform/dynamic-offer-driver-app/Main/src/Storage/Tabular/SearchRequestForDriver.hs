@@ -28,6 +28,7 @@ import Kernel.Storage.Esqueleto
 import Kernel.Types.Common (Meters, Money)
 import Kernel.Types.Id
 import Kernel.Types.Time
+import Storage.Tabular.Merchant (MerchantTId)
 import Storage.Tabular.Person (PersonTId)
 import Storage.Tabular.SearchRequest (SearchRequestTId)
 import Storage.Tabular.Vehicle ()
@@ -42,6 +43,7 @@ mkPersist
       id Text
       transactionId Text
       searchRequestId SearchRequestTId
+      merchantId MerchantTId
       startTime UTCTime
       actualDistanceToPickup Meters
       straightLineDistanceToPickup Meters
@@ -82,6 +84,7 @@ instance FromTType SearchRequestForDriverT Domain.SearchRequestForDriver where
         { id = Id id,
           driverId = fromKey driverId,
           searchRequestId = fromKey searchRequestId,
+          merchantId = fromKey merchantId,
           ..
         }
 
@@ -91,5 +94,6 @@ instance ToTType SearchRequestForDriverT Domain.SearchRequestForDriver where
       { id = getId id,
         driverId = toKey driverId,
         searchRequestId = toKey searchRequestId,
+        merchantId = toKey merchantId,
         ..
       }

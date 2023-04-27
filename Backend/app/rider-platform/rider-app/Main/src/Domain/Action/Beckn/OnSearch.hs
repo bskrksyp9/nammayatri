@@ -171,6 +171,7 @@ buildEstimate requestId providerInfo now _searchRequest EstimateInfo {..} = do
   pure
     DEstimate.Estimate
       { id = uid,
+        merchantId = _searchRequest.merchantId,
         autoAssignEnabled = False,
         autoAssignQuoteId = Nothing,
         autoAssignEnabledV2 = False,

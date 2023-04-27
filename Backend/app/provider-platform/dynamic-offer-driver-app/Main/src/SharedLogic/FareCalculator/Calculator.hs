@@ -190,7 +190,6 @@ calculateSlabFareParameters fp distance time mbExtraFare customerExtraFee = do
   let baseDistanceFare = roundToIntegral $ slab.fare
       waitingOrPickupCharges = roundToIntegral $ slab.waitingCharge
       nightCoefIncluded = isNightShift fp.nightShiftStart fp.nightShiftEnd time
-
   id <- generateGUID
   pure
     FareParameters

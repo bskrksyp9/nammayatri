@@ -112,6 +112,7 @@ sendSearchRequestToDrivers searchReq baseFare driverMinExtraFee driverMaxExtraFe
               { id = guid,
                 transactionId = searchRequest.transactionId,
                 searchRequestId = searchRequest.id,
+                merchantId = searchRequest.providerId,
                 startTime = searchRequest.startTime,
                 searchRequestValidTill = validTill,
                 driverId = cast dpRes.driverId,

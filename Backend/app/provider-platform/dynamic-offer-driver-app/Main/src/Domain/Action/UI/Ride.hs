@@ -206,7 +206,7 @@ otpRideCreate driver otpCode booking = do
 
   driverInfo <- QDriverInformation.findById (cast driver.id) >>= fromMaybeM DriverInfoNotFound
   when driverInfo.onRide $ throwError DriverOnRide
-  ride <- buildRide otpCode driver.id
+  ride <- buildRide otpCode driver.id transporter.id
   rideDetails <- buildRideDetails ride
   Esq.runTransaction $ do
     QBooking.updateStatus booking.id DRB.TRIP_ASSIGNED
@@ -232,7 +232,7 @@ otpRideCreate driver otpCode booking = do
             cs (showTimeIst uBooking.startTime) <> ".",
             "Check the app for more details."
           ]
-    buildRide otp driverId = do
+    buildRide otp driverId merchantId = do
       guid <- Id <$> generateGUID
       shortId <- generateShortId
       now <- getCurrentTime
@@ -242,6 +242,7 @@ otpRideCreate driver otpCode booking = do
           { id = guid,
             bookingId = booking.id,
             shortId = shortId,
+            merchantId = merchantId,
             status = DRide.NEW,
             driverId = cast driverId,
             otp = otp,

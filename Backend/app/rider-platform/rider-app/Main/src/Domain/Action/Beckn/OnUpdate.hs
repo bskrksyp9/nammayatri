@@ -28,6 +28,7 @@ import qualified Domain.Types.Booking as SRB
 import qualified Domain.Types.BookingCancellationReason as SBCR
 import qualified Domain.Types.Estimate as DEstimate
 import qualified Domain.Types.FarePolicy.FareBreakup as DFareBreakup
+import qualified Domain.Types.Merchant as DMerchant
 import qualified Domain.Types.Person.PersonFlowStatus as DPFS
 import qualified Domain.Types.Ride as SRide
 import qualified Domain.Types.SearchRequest as DSR
@@ -182,6 +183,7 @@ onUpdate RideAssignedReq {..} = do
         SRide.Ride
           { id = guid,
             bookingId = booking.id,
+            merchantId = booking.merchantId,
             status = SRide.NEW,
             trackingUrl = Nothing,
             fare = Nothing,
@@ -258,7 +260,7 @@ onUpdate BookingCancelledReq {..} = do
     throwError (BookingInvalidStatus (show booking.status))
   mbRide <- QRide.findActiveByRBId booking.id
   logTagInfo ("BookingId-" <> getId booking.id) ("Cancellation reason " <> show cancellationSource)
-  bookingCancellationReason <- buildBookingCancellationReason booking.id (mbRide <&> (.id)) cancellationSource
+  bookingCancellationReason <- buildBookingCancellationReason booking.id (mbRide <&> (.id)) cancellationSource booking.merchantId
   merchantConfigs <- CMC.findAllByMerchantId booking.merchantId
   case cancellationSource of
     SBCR.ByUser -> SMC.updateCustomerFraudCounters booking.riderId merchantConfigs
@@ -282,7 +284,7 @@ onUpdate BookingCancelledReq {..} = do
 onUpdate BookingReallocationReq {..} = do
   booking <- runInReplica $ QRB.findByBPPBookingId bppBookingId >>= fromMaybeM (BookingDoesNotExist $ "BppBookingId: " <> bppBookingId.getId)
   mbRide <- QRide.findActiveByRBId booking.id
-  bookingCancellationReason <- buildBookingCancellationReason booking.id (mbRide <&> (.id)) reallocationSource
+  bookingCancellationReason <- buildBookingCancellationReason booking.id (mbRide <&> (.id)) reallocationSource booking.merchantId
   ride <- QRide.findByBPPRideId bppRideId >>= fromMaybeM (RideDoesNotExist $ "BppRideId" <> bppRideId.getId)
   DB.runTransaction $ do
     QRB.updateStatus booking.id SRB.AWAITING_REASSIGNMENT
@@ -304,7 +306,7 @@ onUpdate EstimateRepetitionReq {..} = do
   searchReq <- QSR.findById searchRequestId >>= fromMaybeM (SearchRequestNotFound searchRequestId.getId)
   ride <- QRide.findByBPPRideId bppRideId >>= fromMaybeM (RideDoesNotExist $ "BppRideId" <> bppRideId.getId)
   estimate <- QEstimate.findByBPPEstimateId bppEstimateId >>= fromMaybeM (EstimateDoesNotExist bppEstimateId.getId)
-  bookingCancellationReason <- buildBookingCancellationReason booking.id (Just ride.id) cancellationSource
+  bookingCancellationReason <- buildBookingCancellationReason booking.id (Just ride.id) cancellationSource booking.merchantId
   logTagInfo ("EstimateId-" <> getId estimate.id) "Estimate repetition."
 
   DB.runTransaction $ do
@@ -322,12 +324,14 @@ buildBookingCancellationReason ::
   Id SRB.Booking ->
   Maybe (Id SRide.Ride) ->
   SBCR.CancellationSource ->
+  Id DMerchant.Merchant ->
   m SBCR.BookingCancellationReason
-buildBookingCancellationReason bookingId mbRideId cancellationSource = do
+buildBookingCancellationReason bookingId mbRideId cancellationSource merchantId = do
   return
     SBCR.BookingCancellationReason
       { bookingId = bookingId,
         rideId = mbRideId,
+        merchantId = merchantId,
         source = cancellationSource,
         reasonCode = Nothing,
         reasonStage = Nothing,

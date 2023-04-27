@@ -28,6 +28,7 @@ import Kernel.Prelude
 import Kernel.Storage.Esqueleto
 import Kernel.Types.Common hiding (id)
 import Kernel.Types.Id
+import Storage.Tabular.Merchant (MerchantTId)
 import qualified Storage.Tabular.SearchRequest as SSearchRequest
 import qualified Storage.Tabular.TripTerms as STripTerms
 
@@ -40,6 +41,7 @@ mkPersist
     EstimateT sql=estimate
       id Text
       requestId SSearchRequest.SearchRequestTId
+      merchantId MerchantTId
       bppEstimateId Text
       autoAssignEnabled Bool
       autoAssignEnabledV2 Bool

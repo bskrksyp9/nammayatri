@@ -45,6 +45,7 @@ import qualified Domain.Types.Merchant as DM
 import qualified Domain.Types.Ride as SRide
 import qualified Domain.Types.SearchRequest as DSR
 import Kernel.Prelude
+import Kernel.Storage.Esqueleto (EsqDBReplicaFlow)
 import Kernel.Storage.Hedis
 import qualified Kernel.Types.Beckn.Context as Context
 import Kernel.Types.Beckn.ReqTypes
@@ -138,7 +139,8 @@ sendRideAssignedUpdateToBAP ::
     HasShortDurationRetryCfg r c,
     HedisFlow m r,
     HasFlowEnv m r '["nwAddress" ::: BaseUrl],
-    CoreMetrics m
+    CoreMetrics m,
+    EsqDBReplicaFlow m r
   ) =>
   DRB.Booking ->
   SRide.Ride ->
@@ -164,7 +166,8 @@ sendRideStartedUpdateToBAP ::
     HasLongDurationRetryCfg r c,
     HedisFlow m r,
     HasFlowEnv m r '["nwAddress" ::: BaseUrl],
-    CoreMetrics m
+    CoreMetrics m,
+    EsqDBReplicaFlow m r
   ) =>
   DRB.Booking ->
   SRide.Ride ->
@@ -188,7 +191,8 @@ sendRideCompletedUpdateToBAP ::
     HasHttpClientOptions r c,
     HasLongDurationRetryCfg r c,
     HasFlowEnv m r '["nwAddress" ::: BaseUrl],
-    CoreMetrics m
+    CoreMetrics m,
+    EsqDBReplicaFlow m r
   ) =>
   DRB.Booking ->
   SRide.Ride ->
@@ -211,7 +215,8 @@ sendBookingCancelledUpdateToBAP ::
     HasFlowEnv m r '["nwAddress" ::: BaseUrl],
     HasHttpClientOptions r c,
     HasLongDurationRetryCfg r c,
-    CoreMetrics m
+    CoreMetrics m,
+    EsqDBReplicaFlow m r
   ) =>
   DRB.Booking ->
   DM.Merchant ->
@@ -274,7 +279,8 @@ sendDriverArrivalUpdateToBAP ::
     HasHttpClientOptions r c,
     HasShortDurationRetryCfg r c,
     HasFlowEnv m r '["nwAddress" ::: BaseUrl],
-    CoreMetrics m
+    CoreMetrics m,
+    EsqDBReplicaFlow m r
   ) =>
   DRB.Booking ->
   SRide.Ride ->
@@ -299,7 +305,8 @@ sendEstimateRepetitionUpdateToBAP ::
     HasHttpClientOptions r c,
     HasShortDurationRetryCfg r c,
     HasFlowEnv m r '["nwAddress" ::: BaseUrl],
-    CoreMetrics m
+    CoreMetrics m,
+    EsqDBReplicaFlow m r
   ) =>
   DRB.Booking ->
   SRide.Ride ->

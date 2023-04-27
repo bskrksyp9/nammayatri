@@ -102,6 +102,14 @@ getInProgressByDriverId driverId = Esq.findOne $ do
       &&. ride ^. RideStatus ==. val Ride.INPROGRESS
   pure ride
 
+getNewByDriverId :: Transactionable m => Id Person -> m (Maybe Ride)
+getNewByDriverId driverId = Esq.findOne $ do
+  ride <- from $ table @RideT
+  where_ $
+    ride ^. RideDriverId ==. val (toKey driverId)
+      &&. ride ^. RideStatus ==. val Ride.NEW
+  pure ride
+
 getInProgressOrNewRideIdAndStatusByDriverId :: Transactionable m => Id Person -> m (Maybe (Id Ride, RideStatus))
 getInProgressOrNewRideIdAndStatusByDriverId driverId = do
   mbTuple :: Maybe (Text, RideStatus) <- Esq.findOne $ do

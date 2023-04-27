@@ -742,7 +742,13 @@ respondQuote driverId req = do
     organization <- CQM.findById sReq.providerId >>= fromMaybeM (MerchantDoesNotExist sReq.providerId.getId)
     driver <- QPerson.findById driverId >>= fromMaybeM (PersonNotFound driverId.getId)
     driverInfo <- QDriverInformation.findById (cast driverId) >>= fromMaybeM DriverInfoNotFound
-    when driverInfo.onRide $ throwError DriverOnRide
+    transporterConfig <- CQTC.findByMerchantId sReq.providerId >>= fromMaybeM (TransporterConfigDoesNotExist sReq.providerId.getId)
+    _ <-
+      if transporterConfig.includeDriverCurrentlyOnRide && driverInfo.onRide
+        then do
+          inProgressRide <- QRide.getInProgressByDriverId driver.id
+          whenNothing_ inProgressRide $ throwError DriverOnRideButNoInprogressRide
+        else when driverInfo.onRide $ throwError DriverOnRide
     sReqFD <-
       QSRD.findByDriverAndSearchReq driverId sReq.id
         >>= fromMaybeM NoSearchRequestForDriver

@@ -75,7 +75,8 @@ cancelBooking ::
     CoreMetrics m,
     HasHttpClientOptions r c,
     HasLongDurationRetryCfg r c,
-    HasCacheConfig r
+    HasCacheConfig r,
+    EsqDBReplicaFlow m r
   ) =>
   DRB.Booking ->
   Id DM.Merchant ->

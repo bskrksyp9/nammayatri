@@ -76,7 +76,8 @@ buildOnUpdateMessage RideAssignedBuildReq {..} = do
           { name = name,
             phone = mobileNumber,
             rating = realToFrac <$> driver.rating,
-            tags = RideAssignedOU.AgentTags {registered_at = driver.createdAt}
+            tags = RideAssignedOU.AgentTags {registered_at = driver.createdAt},
+            driverLastDropLocation = Nothing
           }
       veh =
         RideAssignedOU.Vehicle

@@ -28,6 +28,7 @@ import qualified Domain.Types.Ride as Ride
 import qualified Domain.Types.RiderDetails as RD
 import EulerHS.Prelude hiding (id)
 import qualified Kernel.External.FCM.Types as FCM
+import Kernel.External.Maps
 import qualified Kernel.Storage.Esqueleto as Esq
 import Kernel.Types.Common
 import Kernel.Types.Id
@@ -98,20 +99,43 @@ getDistanceBetweenPoints ::
   ( EncFlow m r,
     CacheFlow m r,
     EsqDBFlow m r,
-    Metrics.CoreMetrics m,
-    Maps.HasCoordinates a,
-    Maps.HasCoordinates b
+    Metrics.CoreMetrics m
   ) =>
   Id Merchant ->
-  a ->
-  b ->
+  LatLong ->
+  LatLong ->
+  [LatLong] ->
   m Meters
-getDistanceBetweenPoints merchantId a b = do
-  distRes <-
-    Maps.getDistance merchantId $
-      Maps.GetDistanceReq
-        { origin = a,
-          destination = b,
-          travelMode = Just Maps.CAR
+getDistanceBetweenPoints merchantId origin destination interpolatedPoints = do
+  routeResponse <-
+    Maps.getRoutes merchantId $
+      Maps.GetRoutesReq
+        { waypoints = origin :| ((pickWaypoints interpolatedPoints) <> [destination]),
+          mode = Just Maps.CAR,
+          calcPoints = True
         }
-  return $ distRes.distance
+  let mbShortestRouteDistance = (.distance) =<< getRouteInfoWithShortestDuration routeResponse
+  -- Next error is impossible, because we never receive empty list from directions api
+  mbShortestRouteDistance & fromMaybeM (InvalidRequest "Couldn't calculate route distance")
+
+-- TODO reuse code from rider-app
+getRouteInfoWithShortestDuration :: [Maps.RouteInfo] -> Maybe Maps.RouteInfo
+getRouteInfoWithShortestDuration [] = Nothing
+getRouteInfoWithShortestDuration (routeInfo : routeInfoArray) =
+  if null routeInfoArray
+    then Just routeInfo
+    else do
+      restRouteResult <- getRouteInfoWithShortestDuration routeInfoArray
+      Just $ comparator routeInfo restRouteResult
+  where
+    comparator route1 route2 =
+      if route1.duration < route2.duration
+        then route1
+        else route2
+
+-- for distance api we can't pick more than 10 waypoints
+-- test this function
+pickWaypoints :: [LatLong] -> [LatLong]
+pickWaypoints waypoints = do
+  let step = (length waypoints) `div` 10
+  foldl (\list (n, waypoint) -> if n `mod` step == 0 then waypoint : list else list) [] $ zip [1, 2 ..] waypoints

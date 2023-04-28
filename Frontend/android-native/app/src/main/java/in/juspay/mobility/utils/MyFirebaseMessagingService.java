@@ -230,6 +230,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 this.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String token = sharedPref.getString("REGISTERATION_TOKEN", "null");
         String baseUrl = sharedPref.getString("BASE_URL", "null");
+        String deviceDetails = sharedPref.getString("DEVICE_DETAILS", "null");
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         executor.execute(() -> {
@@ -249,6 +250,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     connection.setRequestMethod("POST");
                     connection.setRequestProperty("Content-Type", "application/json");
                     connection.setRequestProperty("token", token);
+                    connection.setRequestProperty("x-device", deviceDetails);
                     connection.setDoOutput(true);
 
                     JSONObject payload = new JSONObject();

@@ -66,6 +66,7 @@ data KeyStore
   | SESSION_ID
   | HAS_TAKEN_FIRST_RIDE
   | ENABLE_TIPS
+  | DEVICE_DETAILS
 
 derive instance genericKeyStore :: Generic KeyStore _
 

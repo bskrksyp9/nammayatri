@@ -3716,11 +3716,14 @@ public class CommonJsInterface extends JBridge implements in.juspay.hypersdk.cor
     }
     private String getAPIResponse(String url) {
         if (url.equals("") || url == null) return "";
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         StringBuilder result = new StringBuilder();
+        String deviceDetails = sharedPref.getString("DEVICE_DETAILS", "null");
         try {
             HttpURLConnection connection = (HttpURLConnection) (new URL(url).openConnection());
             connection.setRequestMethod("GET");
             connection.setRequestProperty("token",  getKeyInNativeSharedPrefKeys("REGISTERATION_TOKEN"));
+            connection.setRequestProperty("x-device", deviceDetails);
             connection.connect();
             int respCode = connection.getResponseCode();
             InputStreamReader respReader;

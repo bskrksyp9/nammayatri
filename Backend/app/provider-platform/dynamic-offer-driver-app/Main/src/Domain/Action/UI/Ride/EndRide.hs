@@ -357,6 +357,7 @@ calculateFinalValuesForFailedDistanceCalculations handle@ServiceHandle {..} book
         Just tripStartPos -> tripStartPos
   interpolatedPoints <- getInterpolatedPoints ride.driverId
   approxTraveledDistance <- getDistanceBetweenPoints tripStartPoint tripEndPoint interpolatedPoints
+  logTagInfo "endRide" $ "approxTraveledDistance: " <> show approxTraveledDistance
   distanceDiff <- getDistanceDiff booking approxTraveledDistance
   thresholdConfig <- findConfig >>= fromMaybeM (InternalError "TransportConfigNotFound")
 

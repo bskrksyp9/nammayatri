@@ -107,10 +107,13 @@ getDistanceBetweenPoints ::
   [LatLong] ->
   m Meters
 getDistanceBetweenPoints merchantId origin destination interpolatedPoints = do
+  -- somehow interpolated points pushed to redis in reversed order, so we need to reverse it back
+  let pickedWaypoints = origin :| (pickWaypoints (reverse interpolatedPoints) <> [destination])
+  logTagInfo "endRide" $ "pickedWaypoints: " <> show pickedWaypoints
   routeResponse <-
     Maps.getRoutes merchantId $
       Maps.GetRoutesReq
-        { waypoints = origin :| ((pickWaypoints interpolatedPoints) <> [destination]),
+        { waypoints = pickedWaypoints,
           mode = Just Maps.CAR,
           calcPoints = True
         }
@@ -134,8 +137,11 @@ getRouteInfoWithShortestDuration (routeInfo : routeInfoArray) =
         else route2
 
 -- for distance api we can't pick more than 10 waypoints
--- test this function
-pickWaypoints :: [LatLong] -> [LatLong]
+pickWaypoints :: [a] -> [a]
 pickWaypoints waypoints = do
-  let step = (length waypoints) `div` 10
-  foldl (\list (n, waypoint) -> if n `mod` step == 0 then waypoint : list else list) [] $ zip [1, 2 ..] waypoints
+  let step = length waypoints `div` 10
+  take 10 $ foldr (\(n, waypoint) list -> if n `safeMod` step == 0 then waypoint : list else list) [] $ zip [1 ..] waypoints
+
+safeMod :: Int -> Int -> Int
+_ `safeMod` 0 = 0
+a `safeMod` b = a `mod` b

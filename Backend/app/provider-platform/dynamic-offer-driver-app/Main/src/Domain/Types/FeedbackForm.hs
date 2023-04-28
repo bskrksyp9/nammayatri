@@ -12,21 +12,25 @@
  the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Storage.Queries.RatingCategories where
+module Domain.Types.FeedbackForm where
 
-import Beckn.Types.Core.Taxi.Rating.Category
-import qualified Domain.Types.RatingCategories as Domain
+import Beckn.Types.Core.Taxi.Rating.FeedbackForm (AnswerType, FeedbackFormAPIEntity (..))
+import Domain.Types.RatingCategories
 import Kernel.Prelude
-import Kernel.Storage.Esqueleto as Esq
-import Kernel.Types.Id
-import Storage.Tabular.RatingCategories
+import Kernel.Types.Id (Id)
 
-findAll :: Transactionable m => m [Domain.RatingCategory]
-findAll = Esq.findAll $ from $ table @RatingCategoryT
+data FeedbackForm = FeedbackForm
+  { id :: Id FeedbackForm,
+    categoryId :: Id RatingCategory,
+    ratingValue :: Int,
+    question :: Text,
+    answer_type :: AnswerType
+  }
+  deriving (Generic, Show, FromJSON, ToJSON)
 
-findByCategoryName :: Transactionable m => CategoryName -> m (Maybe (Id Domain.RatingCategory))
-findByCategoryName name = Esq.findOne $ do
-  categoryT <- from $ table @RatingCategoryT
-  where_ $
-    categoryT ^. RatingCategoryCategory ==. val name
-  return $ categoryT ^. RatingCategoryTId
+makeFeedbackFormAPIEntity :: FeedbackForm -> FeedbackFormAPIEntity
+makeFeedbackFormAPIEntity FeedbackForm {..} =
+  FeedbackFormAPIEntity
+    { id = ratingValue,
+      ..
+    }

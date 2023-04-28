@@ -171,6 +171,16 @@ getRatingCategories ::
   m GetRatingCategoriesResp
 getRatingCategories = callBecknAPIWithSignature "ratingCategories" API.getRatingCategoriesAPI
 
+getFeedbackForm ::
+  ( MonadFlow m,
+    CoreMetrics m,
+    HasBapInfo r m
+  ) =>
+  BaseUrl ->
+  GetFeedbackFormReq ->
+  m GetFeedbackFormResp
+getFeedbackForm = callBecknAPIWithSignature "feadbacckForm" API.getFeedbackFormAPI
+
 callBecknAPIWithSignature,
   callBecknAPIWithSignatureMetro ::
     ( MonadFlow m,

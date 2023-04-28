@@ -25,6 +25,7 @@ library
       API.Beckn
       API.Beckn.Cancel
       API.Beckn.Confirm
+      API.Beckn.GetFeedbackForm
       API.Beckn.GetRatingCategories
       API.Beckn.Init
       API.Beckn.Rating
@@ -69,6 +70,7 @@ library
       Beckn.ACL.Cancel
       Beckn.ACL.Common
       Beckn.ACL.Confirm
+      Beckn.ACL.GetFeedbackForm
       Beckn.ACL.GetRatingCategories
       Beckn.ACL.Init
       Beckn.ACL.OnConfirm
@@ -156,6 +158,7 @@ library
       Domain.Types.FareParameters
       Domain.Types.FarePolicy
       Domain.Types.FarePolicy.RestrictedExtraFare
+      Domain.Types.FeedbackForm
       Domain.Types.Geometry
       Domain.Types.Issue.Comment
       Domain.Types.Issue.IssueCategory
@@ -262,6 +265,7 @@ library
       Storage.Queries.FareParameters
       Storage.Queries.FarePolicy
       Storage.Queries.FarePolicy.RestrictedExtraFare
+      Storage.Queries.FeedbackForm
       Storage.Queries.Geometry
       Storage.Queries.Issue.Comment
       Storage.Queries.Issue.IssueCategory
@@ -315,6 +319,7 @@ library
       Storage.Tabular.FareParameters
       Storage.Tabular.FarePolicy
       Storage.Tabular.FarePolicy.RestrictedExtraFare
+      Storage.Tabular.FeedbackForm
       Storage.Tabular.Geometry
       Storage.Tabular.Issue.Comment
       Storage.Tabular.Issue.IssueCategory

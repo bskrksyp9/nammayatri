@@ -25,6 +25,7 @@ library
       API.Beckn
       API.Beckn.Cancel
       API.Beckn.Confirm
+      API.Beckn.GetFeedbackForm
       API.Beckn.GetRatingCategories
       API.Beckn.Init
       API.Beckn.Rating
@@ -60,6 +61,7 @@ library
       App.Server
       Beckn.ACL.Cancel
       Beckn.ACL.Confirm
+      Beckn.ACL.GetFeedbackForm
       Beckn.ACL.GetRatingCategories
       Beckn.ACL.Init
       Beckn.ACL.OnConfirm
@@ -132,6 +134,7 @@ library
       Domain.Types.FarePolicy.OneWayFarePolicy
       Domain.Types.FarePolicy.OneWayFarePolicy.PerExtraKmRate
       Domain.Types.FarePolicy.RentalFarePolicy
+      Domain.Types.FeedbackForm
       Domain.Types.Geometry
       Domain.Types.Merchant
       Domain.Types.Merchant.MerchantMessage
@@ -201,6 +204,7 @@ library
       Storage.Queries.FarePolicy.OneWayFarePolicy
       Storage.Queries.FarePolicy.OneWayFarePolicy.PerExtraKmRate
       Storage.Queries.FarePolicy.RentalFarePolicy
+      Storage.Queries.FeedbackForm
       Storage.Queries.FullEntityBuilders
       Storage.Queries.Geometry
       Storage.Queries.Merchant
@@ -246,6 +250,7 @@ library
       Storage.Tabular.FarePolicy.OneWayFarePolicy
       Storage.Tabular.FarePolicy.OneWayFarePolicy.PerExtraKmRate
       Storage.Tabular.FarePolicy.RentalFarePolicy
+      Storage.Tabular.FeedbackForm
       Storage.Tabular.Geometry
       Storage.Tabular.Merchant
       Storage.Tabular.Merchant.MerchantMessage

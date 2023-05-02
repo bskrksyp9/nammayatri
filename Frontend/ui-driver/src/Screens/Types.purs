@@ -404,6 +404,14 @@ type ReferralScreenStateProps = {
   , seconds :: Int
   , id :: String
   , firstTime :: Boolean
+  , leaderBoardType :: LeaderBoardType
+  , showDateSelector :: Boolean
+  , days :: Array LeaderBoardDay
+  , weeks :: Array LeaderBoardWeek
+  , selectedDay :: LeaderBoardDay
+  , selectedWeek :: LeaderBoardWeek
+  , rankersData :: Array RankCardData
+  , currentDriverData :: RankCardData
 }
 
 -- ################################################ IndividualRideCardState ##################################################
@@ -1061,7 +1069,34 @@ instance showYoutubeVideoStatus :: Show YoutubeVideoStatus where show = genericS
 instance eqYoutubeVideoStatus :: Eq YoutubeVideoStatus where eq = genericEq
 
 
-data ReferralType = SuccessScreen | ComingSoonScreen | ReferralFlow | QRScreen
+data ReferralType = SuccessScreen | ComingSoonScreen | ReferralFlow | QRScreen | LeaderBoard
 
 derive instance genericReferralType :: Generic ReferralType _
 instance eqReferralType :: Eq ReferralType where eq = genericEq
+
+data LeaderBoardType = Daily | Weekly
+
+derive instance genericLeaderBoardType :: Generic LeaderBoardType _
+instance eqLeaderBoardType :: Eq LeaderBoardType where eq = genericEq
+
+type LeaderBoardDay = {
+    date :: Int
+  , month :: String
+  , year :: Int
+}
+
+type LeaderBoardWeek = {
+    startDate :: Int
+  , endDate :: Int
+  , startMonth :: String
+  , endMonth :: String
+}
+
+data DateSelector = DaySelector LeaderBoardDay | WeekSelector LeaderBoardWeek
+
+type RankCardData = {
+    goodName :: String
+  , profileUrl :: Maybe String
+  , rank :: Int
+  , rides :: Int
+}

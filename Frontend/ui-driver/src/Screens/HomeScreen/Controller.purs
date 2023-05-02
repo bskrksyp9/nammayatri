@@ -36,7 +36,7 @@ import Effect (Effect)
 import Effect.Class (liftEffect)
 import Engineering.Helpers.Commons (clearTimer)
 import Helpers.Utils (convertUTCtoISC, currentPosition, differenceBetweenTwoUTC, getDistanceBwCordinates, parseFloat,setText',getTime, getCurrentUTC, differenceBetweenTwoUTC)
-import JBridge (animateCamera, enableMyLocation, firebaseLogEvent, getCurrentPosition, getHeightFromPercent, hideKeyboardOnNavigation, isLocationEnabled, isLocationPermissionEnabled, minimizeApp, openNavigation, removeAllPolylines, requestLocation, showDialer, showMarker, toast, firebaseLogEventWithTwoParams,sendMessage, scrollToBottom, stopChatListenerService)
+import JBridge (animateCamera, enableMyLocation, firebaseLogEvent, getCurrentPosition, getHeightFromPercent, hideKeyboardOnNavigation, isLocationEnabled, isLocationPermissionEnabled, minimizeApp, openNavigation, removeAllPolylines, requestLocation, showDialer, showMarker, toast, firebaseLogEventWithTwoParams,sendMessage, scrollToEnd, stopChatListenerService)
 import Language.Strings (getString)
 import Language.Types (STR(..))
 import Log (printLog, trackAppActionClick, trackAppEndScreen, trackAppScreenRender, trackAppBackPress, trackAppTextInput, trackAppScreenEvent)
@@ -630,7 +630,7 @@ updateMessagesWithCmd :: ST.HomeScreenState -> Eval Action ScreenOutput ST.HomeS
 updateMessagesWithCmd state =
   continueWithCmd state [ do
     if(state.props.currentStage == ST.ChatWithCustomer) then do
-      _ <- pure $ scrollToBottom (getNewIDWithTag "ChatScrollView")
+      _ <- pure $ scrollToEnd (getNewIDWithTag "ChatScrollView") true
       pure unit
     else
       pure unit

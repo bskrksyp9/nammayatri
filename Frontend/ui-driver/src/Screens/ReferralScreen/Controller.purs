@@ -15,8 +15,8 @@
 
 module Screens.ReferralScreen.Controller where
 
-import Prelude (bind , class Show, pure, unit, ($), discard , (>=) , (<=) ,(==),(&&) , not ,(+) , show , void)
-import Screens.Types (ReferralScreenState, ReferralType(..))
+import Prelude (bind , class Show, pure, unit, ($), discard , (>=) , (<=) ,(==),(&&) , not ,(+) , show , void, (<>), when)
+import Screens.Types (ReferralScreenState, ReferralType(..), LeaderBoardType(..), DateSelector(..))
 import Components.BottomNavBar as BottomNavBar
 import Components.GenericHeader as GenericHeader
 import Components.PrimaryEditText.Controllers as PrimaryEditText
@@ -28,11 +28,14 @@ import PrestoDOM.Types.Core (class Loggable)
 import Log (trackAppActionClick, trackAppEndScreen, trackAppScreenRender, trackAppBackPress , trackAppTextInput, trackAppScreenEvent)
 import Screens (ScreenName(..), getScreen)
 import Data.String (length)
-import JBridge (hideKeyboardOnNavigation, toast, showDialer, firebaseLogEvent)
+import JBridge (hideKeyboardOnNavigation, toast, showDialer, firebaseLogEvent, scrollToEnd)
 import Services.Config (getSupportNumber)
 import Debug (spy)
-import Helpers.Utils (clearTimer)
+import Helpers.Utils (clearTimer, getPastDays, getPastWeeks)
 import Storage (setValueToLocalNativeStore, KeyStore(..))
+import Engineering.Helpers.Commons (getNewIDWithTag)
+import Data.Array (last, (!!))
+import Data.Maybe (Maybe(..))
 
 
 instance showAction :: Show Action where
@@ -94,6 +97,12 @@ instance loggableAction :: Loggable Action where
     EnableReferralFlow -> trackAppActionClick appId (getScreen REFERRAL_SCREEN) "in_screen" "enable_referral_flow"
     EnableReferralFlowNoAction -> trackAppActionClick appId (getScreen REFERRAL_SCREEN) "in_screen" "enable_referral_flow_no_action"
     SuccessScreenRenderAction -> trackAppScreenEvent appId (getScreen REFERRAL_SCREEN) "in_screen" "your_referral_code_is_linked"
+    ChangeLeaderBoardtab _ -> trackAppScreenEvent appId (getScreen REFERRAL_SCREEN) "in_screen" "change_leader_board_tab"
+    DateSelectorAction -> trackAppScreenEvent appId (getScreen REFERRAL_SCREEN) "in_screen" "date_selector_clicked"
+    ChangeDate date ->
+      case date of
+        DaySelector _ -> trackAppScreenEvent appId (getScreen REFERRAL_SCREEN) "in_screen" "day_changed"
+        WeekSelector _ -> trackAppScreenEvent appId (getScreen REFERRAL_SCREEN) "in_screen" "week_changed"
 
 data Action = BottomNavBarAction BottomNavBar.Action
             | GenericHeaderActionController GenericHeader.Action
@@ -109,6 +118,9 @@ data Action = BottomNavBarAction BottomNavBar.Action
             | EnableReferralFlowNoAction
             | AfterRender
             | SuccessScreenRenderAction
+            | ChangeLeaderBoardtab LeaderBoardType
+            | DateSelectorAction
+            | ChangeDate DateSelector
 
 data ScreenOutput = GoToHomeScreen
                   | GoBack
@@ -117,6 +129,29 @@ data ScreenOutput = GoToHomeScreen
                   | GoToNotifications
                   | LinkReferralApi ReferralScreenState
 eval :: Action -> ReferralScreenState -> Eval Action ScreenOutput ReferralScreenState
+
+eval AfterRender state = do
+  let pastDates = getPastDays 7
+      pastWeeks = getPastWeeks 7
+      selectedDay = case last pastDates of
+                      Just date -> date
+                      Nothing -> state.props.selectedDay
+      selectedWeek = case last pastWeeks of
+                      Just week -> week
+                      Nothing -> state.props.selectedWeek
+  continue state { props { days = pastDates, weeks = pastWeeks, selectedDay = selectedDay, selectedWeek = selectedWeek } }
+
+eval (ChangeDate (DaySelector item)) state = continue state { props { selectedDay = item } }
+
+eval (ChangeDate (WeekSelector item)) state = continue state { props { selectedWeek = item } }
+
+eval DateSelectorAction state = do
+  _ <- pure $ scrollToEnd (getNewIDWithTag "DateSelector") false
+  continue state { props { showDateSelector = not state.props.showDateSelector } }
+
+eval (ChangeLeaderBoardtab tab) state = do
+  _ <- pure $ scrollToEnd (getNewIDWithTag "DateSelector") false
+  continue state { props { leaderBoardType = tab } }
 
 eval BackPressed state = exit $ GoBack
 

@@ -91,6 +91,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -3237,15 +3238,22 @@ public class CommonJsInterface extends JBridge implements in.juspay.hypersdk.cor
 
     @JavascriptInterface
     public static void sendMessage(final String message){
-        ChatService.sendMessage(message); 
+        ChatService.sendMessage(message);
     }
 
     @JavascriptInterface
-    public void scrollToBottom(final String id){
+    public void scrollToEnd(final String id, final boolean bottom){
        try {
-           ScrollView scrollView = activity.findViewById(Integer.parseInt(id));
-           if(scrollView != null){
-               scrollView.fullScroll(View.FOCUS_DOWN);
+           if (bottom) {
+               ScrollView scrollView = activity.findViewById(Integer.parseInt(id));
+               if (scrollView != null) {
+                   scrollView.fullScroll(View.FOCUS_DOWN);
+               }
+           }else {
+               HorizontalScrollView horizontalScrollView = activity.findViewById(Integer.parseInt(id));
+               if (horizontalScrollView != null) {
+                   horizontalScrollView.fullScroll(View.FOCUS_RIGHT);
+               }
            }
        } catch(Exception e) {
            Log.e(LOG_TAG,"Error in scroll to Bottom : " + e);

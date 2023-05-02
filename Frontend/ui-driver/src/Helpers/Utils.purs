@@ -29,7 +29,7 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Juspay.OTP.Reader as Readers
 import Data.Array.NonEmpty (fromArray)
 import Effect.Class (liftEffect)
-import Screens.Types (AllocationData, YoutubeData)
+import Screens.Types (AllocationData, YoutubeData, LeaderBoardDay, LeaderBoardWeek)
 import Language.Strings (getString)
 import Language.Types(STR(..))
 import Prelude ((/),(*),(-))

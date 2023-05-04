@@ -26,7 +26,7 @@ import Kernel.Prelude
 import Kernel.Storage.Esqueleto
 import Kernel.Types.Common hiding (id)
 import Kernel.Types.Id
-import Storage.Tabular.Booking.BookingLocation hiding (createdAt, id, updatedAt)
+import Storage.Tabular.Booking.TripLocation hiding (createdAt, id, updatedAt)
 import qualified Storage.Tabular.FareParameters as Fare
 import Storage.Tabular.Merchant (MerchantTId)
 import Storage.Tabular.RiderDetails (RiderDetailsTId)
@@ -51,8 +51,8 @@ mkPersist
       bapUri Text
       startTime UTCTime
       riderId RiderDetailsTId Maybe
-      fromLocationId BookingLocationTId
-      toLocationId BookingLocationTId
+      fromLocationId TripLocationTId
+      toLocationId TripLocationTId
       vehicleVariant Veh.Variant
       estimatedDistance Meters
       maxEstimatedDistance Centesimal Maybe
@@ -72,13 +72,13 @@ instance TEntityKey BookingT where
   fromKey (BookingTKey _id) = Id _id
   toKey (Id id) = BookingTKey id
 
-type FullBookingT = (BookingT, BookingLocationT, BookingLocationT, Fare.FareParametersT)
+type FullBookingT = (BookingT, TripLocationT, TripLocationT, Fare.FareParametersT)
 
 instance FromTType FullBookingT Domain.Booking where
   fromTType (BookingT {..}, fromLoc, toLoc, fareParametersT) = do
     pUrl <- parseBaseUrl bapUri
-    let fromLoc_ = mkDomainBookingLocation fromLoc
-        toLoc_ = mkDomainBookingLocation toLoc
+    let fromLoc_ = mkDomainTripLocation fromLoc
+        toLoc_ = mkDomainTripLocation toLoc
     fareParams <- fromTType fareParametersT
     return $
       Domain.Booking
@@ -105,7 +105,7 @@ instance ToTType FullBookingT Domain.Booking where
           fareParametersId = toKey fareParams.id,
           ..
         },
-      mkTabularBookingLocation fromLocation,
-      mkTabularBookingLocation toLocation,
+      mkTabularTripLocation fromLocation,
+      mkTabularTripLocation toLocation,
       toTType fareParams
     )

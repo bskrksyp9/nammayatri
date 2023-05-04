@@ -22,6 +22,12 @@ import qualified Kernel.Storage.Hedis as Hedis
 import Storage.CachedQueries.CacheConfig
 import qualified Storage.Queries.Maps.PlaceNameCache as Queries
 
+findPlaceByLatLon :: (CacheFlow m r, Esq.EsqDBFlow m r) => Double -> Double -> m (Maybe PlaceNameCache)
+findPlaceByLatLon lat lon =
+  Hedis.safeGet (makeLatLongIdKey lat lon) >>= \case
+    Just a -> return a
+    Nothing -> cachedPlaceByLatLon lat lon /=<< Queries.findPlaceByLatLong lat lon
+
 findPlaceByPlaceId :: (CacheFlow m r, Esq.EsqDBFlow m r) => Text -> m [PlaceNameCache]
 findPlaceByPlaceId placeId =
   Hedis.safeGet (makePlaceIdKey placeId) >>= \case
@@ -44,6 +50,12 @@ cachedPlaceByPlaceId placeId placeNameCached = do
   let placeIdKey = makePlaceIdKey placeId
   Hedis.setExp placeIdKey placeNameCached expTime
 
+cachedPlaceByLatLon :: CacheFlow m r => Double -> Double -> Maybe PlaceNameCache -> m ()
+cachedPlaceByLatLon lat lon placeNameCached = do
+  expTime <- fromIntegral <$> asks (.cacheConfig.configsExpTime)
+  let placeIdKey = makeLatLongIdKey lat lon
+  Hedis.setExp placeIdKey placeNameCached expTime
+
 cachedPlaceByGeoHash :: CacheFlow m r => Text -> [PlaceNameCache] -> m ()
 cachedPlaceByGeoHash geoHash placeNameCached = do
   expTime <- fromIntegral <$> asks (.cacheConfig.configsExpTime)
@@ -55,3 +67,6 @@ makePlaceIdKey placeId = "CachedQueries:Maps:PlaceId-" <> placeId
 
 makeGeoHashIdKey :: Text -> Text
 makeGeoHashIdKey geoHash = "CachedQueries:Maps:GeoHash-" <> geoHash
+
+makeLatLongIdKey :: Double -> Double -> Text
+makeLatLongIdKey lat lon = "CachedQueries:Maps:LatLon-" <> show lat <> show lon

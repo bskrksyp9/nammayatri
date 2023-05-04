@@ -21,7 +21,7 @@ where
 import qualified "dashboard-helper-api" Dashboard.Common as Common
 import qualified "dashboard-helper-api" Dashboard.RiderPlatform.Ride as Common
 import Data.Coerce (coerce)
-import Domain.Types.Booking.BookingLocation (BookingLocation (..))
+import Domain.Types.Booking.TripLocation (TripLocation (..))
 import qualified Domain.Types.Booking.Type as DB
 import Domain.Types.LocationAddress
 import qualified Domain.Types.Merchant as DM
@@ -48,10 +48,10 @@ mkCommonRideStatus rs = case rs of
   Domain.COMPLETED -> Common.COMPLETED
   Domain.CANCELLED -> Common.CANCELLED
 
-mkCommonBookingLocation :: BookingLocation -> Common.BookingLocation
-mkCommonBookingLocation BookingLocation {..} =
+mkCommonBookingLocation :: TripLocation -> Common.BookingLocation
+mkCommonBookingLocation TripLocation {..} =
   Common.BookingLocation
-    { id = cast @BookingLocation @Common.BookingLocation id,
+    { id = cast @TripLocation @Common.BookingLocation id,
       address = mkAddressRes address,
       ..
     }

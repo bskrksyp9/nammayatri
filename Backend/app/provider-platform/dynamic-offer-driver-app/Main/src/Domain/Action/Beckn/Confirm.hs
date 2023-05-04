@@ -17,7 +17,7 @@ module Domain.Action.Beckn.Confirm where
 import Data.String.Conversions
 import qualified Data.Text as T
 import Domain.Types.Booking as DRB
-import qualified Domain.Types.Booking.BookingLocation as DBL
+import qualified Domain.Types.Booking.TripLocation as DBL
 import qualified Domain.Types.BookingCancellationReason as DBCR
 import qualified Domain.Types.Driver.DriverFlowStatus as DDFS
 import qualified Domain.Types.DriverQuote as DDQ
@@ -47,7 +47,7 @@ import qualified SharedLogic.Ride as SRide
 import Storage.CachedQueries.CacheConfig
 import Storage.CachedQueries.Merchant as QM
 import Storage.Queries.Booking as QRB
-import qualified Storage.Queries.Booking.BookingLocation as QBL
+import qualified Storage.Queries.Booking.TripLocation as QBL
 import qualified Storage.Queries.BookingCancellationReason as QBCR
 import qualified Storage.Queries.BusinessEvent as QBE
 import qualified Storage.Queries.Driver.DriverFlowStatus as QDFS
@@ -74,8 +74,8 @@ data DConfirmReq = DConfirmReq
 data DConfirmRes = DConfirmRes
   { booking :: DRB.Booking,
     ride :: Maybe DRide.Ride,
-    fromLocation :: DBL.BookingLocation,
-    toLocation :: DBL.BookingLocation,
+    fromLocation :: DBL.TripLocation,
+    toLocation :: DBL.TripLocation,
     riderDetails :: DRD.RiderDetails,
     transporter :: DM.Merchant
   }
@@ -226,6 +226,8 @@ handler subscriber transporterId req = do
             tripEndPos = Nothing,
             fareParametersId = Nothing,
             distanceCalculationFailed = Nothing,
+            fromLocationId = booking.fromLocation.id,
+            toLocationId = booking.toLocation.id,
             createdAt = now,
             updatedAt = now
           }

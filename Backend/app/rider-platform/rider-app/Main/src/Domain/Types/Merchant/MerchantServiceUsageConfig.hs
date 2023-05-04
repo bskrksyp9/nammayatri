@@ -35,6 +35,7 @@ data MerchantServiceUsageConfigD (s :: UsageSafety) = MerchantServiceUsageConfig
     getPlaceDetails :: MapsService,
     autoComplete :: MapsService,
     smsProvidersPriorityList :: [SmsService],
+    getPlaceNameForTrip :: MapsService,
     whatsappProvidersPriorityList :: [WhatsappService],
     updatedAt :: UTCTime,
     createdAt :: UTCTime

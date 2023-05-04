@@ -26,7 +26,7 @@ where
 import Data.String.Conversions
 import qualified Data.Text as T
 import qualified Domain.Types.Booking as DRB
-import qualified Domain.Types.Booking.BookingLocation as DBLoc
+import qualified Domain.Types.Booking.TripLocation as DBLoc
 import qualified Domain.Types.Driver.DriverFlowStatus as DDFS
 import qualified Domain.Types.Exophone as DExophone
 import qualified Domain.Types.Person as DP
@@ -60,6 +60,7 @@ import qualified Storage.CachedQueries.DriverInformation as QDriverInformation
 import qualified Storage.CachedQueries.Exophone as CQExophone
 import Storage.CachedQueries.Merchant as QM
 import qualified Storage.Queries.Booking as QBooking
+import Storage.Queries.Booking.TripLocation as QTripLocation
 import qualified Storage.Queries.BusinessEvent as QBE
 import qualified Storage.Queries.Driver.DriverFlowStatus as QDFS
 import qualified Storage.Queries.Rating as QR
@@ -74,8 +75,8 @@ data DriverRideRes = DriverRideRes
   { id :: Id DRide.Ride,
     shortRideId :: ShortId DRide.Ride,
     status :: DRide.RideStatus,
-    fromLocation :: DBLoc.BookingLocationAPIEntity,
-    toLocation :: DBLoc.BookingLocationAPIEntity,
+    fromLocation :: DBLoc.TripLocationAPIEntity,
+    toLocation :: DBLoc.TripLocationAPIEntity,
     driverName :: Text,
     driverNumber :: Maybe Text,
     vehicleVariant :: DVeh.Variant,
@@ -120,11 +121,13 @@ listDriverRides ::
 listDriverRides driverId mbLimit mbOffset mbOnlyActive mbRideStatus = do
   rides <- runInReplica $ QRide.findAllByDriverId driverId mbLimit mbOffset mbOnlyActive mbRideStatus
   driverRideLis <- forM rides $ \(ride, booking) -> do
+    fromLocation <- QTripLocation.findById ride.fromLocationId >>= fromMaybeM (InternalError driverId.getId)
+    toLocation <- QTripLocation.findById ride.toLocationId >>= fromMaybeM (InternalError driverId.getId)
     rideDetail <- runInReplica $ QRD.findById ride.id >>= fromMaybeM (VehicleNotFound driverId.getId)
     rideRating <- runInReplica $ QR.findRatingForRide ride.id
     driverNumber <- RD.getDriverNumber rideDetail
     mbExophone <- CQExophone.findByPrimaryPhone booking.primaryExophone
-    pure $ mkDriverRideRes rideDetail driverNumber rideRating mbExophone (ride, booking)
+    pure $ mkDriverRideRes rideDetail driverNumber rideRating mbExophone (ride, booking) fromLocation toLocation
   pure . DriverRideListRes $ driverRideLis
 
 mkDriverRideRes ::
@@ -133,16 +136,18 @@ mkDriverRideRes ::
   Maybe DRating.Rating ->
   Maybe DExophone.Exophone ->
   (DRide.Ride, DRB.Booking) ->
+  DBLoc.TripLocation ->
+  DBLoc.TripLocation ->
   DriverRideRes
-mkDriverRideRes rideDetails driverNumber rideRating mbExophone (ride, booking) = do
+mkDriverRideRes rideDetails driverNumber rideRating mbExophone (ride, booking) fromLocation toLocation = do
   let fareParams = booking.fareParams
   let initial = "" :: Text
   DriverRideRes
     { id = ride.id,
       shortRideId = ride.shortId,
       status = ride.status,
-      fromLocation = DBLoc.makeBookingLocationAPIEntity booking.fromLocation,
-      toLocation = DBLoc.makeBookingLocationAPIEntity booking.toLocation,
+      fromLocation = DBLoc.makeTripLocationAPIEntity fromLocation,
+      toLocation = DBLoc.makeTripLocationAPIEntity toLocation,
       driverName = rideDetails.driverName,
       driverNumber,
       vehicleNumber = rideDetails.vehicleNumber,
@@ -221,7 +226,9 @@ otpRideCreate driver otpCode booking = do
   DS.driverScoreEventHandler DST.OnNewRideAssigned {merchantId = transporter.id, driverId = driver.id}
   driverNumber <- RD.getDriverNumber rideDetails
   mbExophone <- CQExophone.findByPrimaryPhone booking.primaryExophone
-  pure $ mkDriverRideRes rideDetails driverNumber Nothing mbExophone (ride, booking)
+  fromLocation <- QTripLocation.findById ride.fromLocationId >>= fromMaybeM (InternalError ride.id.getId)
+  toLocation <- QTripLocation.findById ride.toLocationId >>= fromMaybeM (InternalError ride.id.getId)
+  pure $ mkDriverRideRes rideDetails driverNumber Nothing mbExophone (ride, booking) fromLocation toLocation
   where
     notificationType = FCM.DRIVER_ASSIGNMENT
     notificationTitle = "Driver has been assigned the ride!"
@@ -256,6 +263,8 @@ otpRideCreate driver otpCode booking = do
             tripEndPos = Nothing,
             fareParametersId = Nothing,
             distanceCalculationFailed = Nothing,
+            fromLocationId = booking.fromLocation.id,
+            toLocationId = booking.toLocation.id,
             createdAt = now,
             updatedAt = now
           }

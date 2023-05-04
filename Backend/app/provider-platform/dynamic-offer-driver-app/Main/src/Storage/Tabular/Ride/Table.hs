@@ -26,6 +26,7 @@ import Kernel.Storage.Esqueleto
 import Kernel.Types.Common (HighPrecMeters, Meters, Money)
 import Kernel.Types.Id
 import Storage.Tabular.Booking (BookingTId)
+import Storage.Tabular.Booking.TripLocation (TripLocationTId)
 import qualified Storage.Tabular.FareParameters as Fare
 import Storage.Tabular.Person (PersonTId)
 
@@ -54,6 +55,8 @@ mkPersist
       tripEndLon Double Maybe
       fareParametersId Fare.FareParametersTId Maybe
       distanceCalculationFailed Bool Maybe
+      fromLocationId TripLocationTId
+      toLocationId TripLocationTId
       createdAt UTCTime
       updatedAt UTCTime
       Primary id

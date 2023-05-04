@@ -46,6 +46,7 @@ mkPersist
       snapToRoad MapsService
       getPlaceName MapsService
       getPlaceDetails MapsService
+      getPlaceNameForTrip MapsService
       autoComplete MapsService
       smsProvidersPriorityList (PostgresList SmsService)
       whatsappProvidersPriorityList (PostgresList WhatsappService)

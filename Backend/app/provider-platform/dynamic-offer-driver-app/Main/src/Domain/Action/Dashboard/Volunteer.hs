@@ -18,7 +18,7 @@ import qualified "dashboard-helper-api" Dashboard.ProviderPlatform.Volunteer as 
 import qualified Domain.Action.UI.Ride as DRide
 import qualified Domain.Action.UI.Ride.StartRide as RideStart
 import qualified Domain.Types.Booking as Domain
-import qualified Domain.Types.Booking.BookingLocation as Domain
+import qualified Domain.Types.Booking.TripLocation as Domain
 import qualified Domain.Types.Merchant as DM
 import Environment
 import Kernel.Prelude
@@ -49,7 +49,7 @@ bookingInfo merchantShortId otpCode = do
           estimatedDuration,
           riderName
         }
-    buildBookingLocation Domain.BookingLocation {..} =
+    buildBookingLocation Domain.TripLocation {..} =
       Common.BookingLocation
         { address = buildLocationAddress address,
           id = cast id,

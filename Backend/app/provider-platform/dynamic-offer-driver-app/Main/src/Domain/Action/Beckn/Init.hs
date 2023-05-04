@@ -15,7 +15,7 @@
 module Domain.Action.Beckn.Init where
 
 import qualified Domain.Types.Booking as DRB
-import qualified Domain.Types.Booking.BookingLocation as DLoc
+import qualified Domain.Types.Booking.TripLocation as DLoc
 import qualified Domain.Types.BookingCancellationReason as DBCR
 import qualified Domain.Types.Exophone as DExophone
 import qualified Domain.Types.FareParameters as DFP
@@ -57,12 +57,12 @@ data InitRes = InitRes
     transporter :: DM.Merchant
   }
 
-buildBookingLocation :: (MonadGuid m) => DLoc.SearchReqLocation -> m DLoc.BookingLocation
-buildBookingLocation DLoc.SearchReqLocation {..} = do
+buildTripLocation :: (MonadGuid m) => DLoc.SearchReqLocation -> m DLoc.TripLocation
+buildTripLocation DLoc.SearchReqLocation {..} = do
   let address = DLoc.LocationAddress {..}
   guid <- generateGUIDText
   pure
-    DLoc.BookingLocation
+    DLoc.TripLocation
       { id = Id guid,
         ..
       }
@@ -149,8 +149,8 @@ handler merchantId req = do
       m DRB.Booking
     buildBooking searchRequest driverQuote bookingType now = do
       id <- Id <$> generateGUID
-      fromLocation <- buildBookingLocation searchRequest.fromLocation
-      toLocation <- buildBookingLocation searchRequest.toLocation
+      fromLocation <- buildTripLocation searchRequest.fromLocation
+      toLocation <- buildTripLocation searchRequest.toLocation
       exophone <- findRandomExophone merchantId
       pure
         DRB.Booking

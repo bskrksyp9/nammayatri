@@ -36,7 +36,7 @@ import Kernel.Types.Version
 import Kernel.Utils.Common hiding (Value)
 import Kernel.Utils.GenericPretty
 import Storage.Tabular.Booking
-import Storage.Tabular.Booking.BookingLocation
+import Storage.Tabular.Booking.TripLocation
 import Storage.Tabular.DriverInformation
 import Storage.Tabular.DriverLocation
 import Storage.Tabular.DriverOnboarding.DriverLicense
@@ -589,7 +589,7 @@ baseFullPersonQueryWithRideInfo ::
         :& Table VehicleT
         :& Table DriverQuoteT
         :& Table BookingT
-        :& Table BookingLocationT
+        :& Table TripLocationT
     )
 baseFullPersonQueryWithRideInfo =
   table @PersonT
@@ -614,9 +614,9 @@ baseFullPersonQueryWithRideInfo =
                  driverQuoteInfo ^. DriverQuoteId ==. bookingInfo ^. BookingQuoteId
                    &&. bookingInfo ^. BookingStatus ==. val Booking.TRIP_ASSIGNED
              )
-    `innerJoin` table @BookingLocationT
+    `innerJoin` table @TripLocationT
     `Esq.on` ( \(_ :& _ :& _ :& _ :& _ :& bookingInfo :& bookingLocationInfo) ->
-                 bookingInfo ^. BookingToLocationId ==. bookingLocationInfo ^. BookingLocationTId
+                 bookingInfo ^. BookingToLocationId ==. bookingLocationInfo ^. TripLocationTId
              )
 
 getNearestDriversCurrentlyOnRide ::
@@ -633,7 +633,7 @@ getNearestDriversCurrentlyOnRide mbVariant LatLong {..} radiusMeters merchantId 
   res <- Esq.findAll $ do
     (personInfo :& locationInfo :& driverInfo :& vehicleInfo :& _ :& _ :& bookingLocationInfo) <-
       from baseFullPersonQueryWithRideInfo
-    let destinationPoint = Esq.getPoint (bookingLocationInfo ^. BookingLocationLat, bookingLocationInfo ^. BookingLocationLon)
+    let destinationPoint = Esq.getPoint (bookingLocationInfo ^. TripLocationLat, bookingLocationInfo ^. TripLocationLon)
         distanceFromDriverToDestination = locationInfo ^. DriverLocationPoint <->. destinationPoint
         onRideRadius = val (fromIntegral (radiusMeters - reduceRadiusValue) :: Double)
         distanceFromDestinationToPickup = Esq.getPoint (val lat, val lon) <->. destinationPoint
@@ -673,8 +673,8 @@ getNearestDriversCurrentlyOnRide mbVariant LatLong {..} radiusMeters merchantId 
         locationInfo ^. DriverLocationLat,
         locationInfo ^. DriverLocationLon,
         vehicleInfo ^. VehicleVariant,
-        bookingLocationInfo ^. BookingLocationLat,
-        bookingLocationInfo ^. BookingLocationLon,
+        bookingLocationInfo ^. TripLocationLat,
+        bookingLocationInfo ^. TripLocationLon,
         distanceFromDriverToDestination +. distanceFromDestinationToPickup,
         distanceFromDriverToDestination,
         driverInfo ^. DriverInformationMode

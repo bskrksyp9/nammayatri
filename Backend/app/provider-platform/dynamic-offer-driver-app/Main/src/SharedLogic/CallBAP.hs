@@ -37,6 +37,7 @@ import qualified Beckn.Types.Core.Taxi.OnUpdate as OnUpdate
 import Control.Lens ((%~))
 import qualified Data.Text as T
 import qualified Domain.Types.Booking as DRB
+import qualified Domain.Types.Booking.TripLocation as DBT
 import qualified Domain.Types.BookingCancellationReason as SRBCR
 import qualified Domain.Types.DriverQuote as DDQ
 import qualified Domain.Types.Estimate as DEst
@@ -193,12 +194,14 @@ sendRideCompletedUpdateToBAP ::
   DRB.Booking ->
   SRide.Ride ->
   Fare.FareParameters ->
+  Maybe DBT.TripLocation ->
+  Maybe DBT.TripLocation ->
   m ()
-sendRideCompletedUpdateToBAP booking ride fareParams = do
+sendRideCompletedUpdateToBAP booking ride fareParams startLocation endLocation = do
   transporter <-
     CQM.findById booking.providerId
       >>= fromMaybeM (MerchantNotFound booking.providerId.getId)
-  let rideCompletedBuildReq = ACL.RideCompletedBuildReq {ride, fareParams}
+  let rideCompletedBuildReq = ACL.RideCompletedBuildReq {ride, fareParams, startLocation, endLocation}
   rideCompletedMsg <- ACL.buildOnUpdateMessage rideCompletedBuildReq
 
   retryConfig <- asks (.longDurationRetryCfg)

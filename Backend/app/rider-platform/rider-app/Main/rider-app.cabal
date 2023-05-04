@@ -131,7 +131,7 @@ library
       Domain.Types.BlackListOrg
       Domain.Types.Booking
       Domain.Types.Booking.API
-      Domain.Types.Booking.BookingLocation
+      Domain.Types.Booking.TripLocation
       Domain.Types.Booking.Type
       Domain.Types.BookingCancellationReason
       Domain.Types.CallStatus
@@ -185,7 +185,7 @@ library
       Storage.CachedQueries.Merchant.MerchantServiceUsageConfig
       Storage.Queries.BlackListOrg
       Storage.Queries.Booking
-      Storage.Queries.Booking.BookingLocation
+      Storage.Queries.Booking.TripLocation
       Storage.Queries.BookingCancellationReason
       Storage.Queries.CallStatus
       Storage.Queries.CancellationReason
@@ -217,7 +217,7 @@ library
       Storage.Queries.Webengage
       Storage.Tabular.BlackListOrg
       Storage.Tabular.Booking
-      Storage.Tabular.Booking.BookingLocation
+      Storage.Tabular.Booking.TripLocation
       Storage.Tabular.BookingCancellationReason
       Storage.Tabular.CallStatus
       Storage.Tabular.CancellationReason

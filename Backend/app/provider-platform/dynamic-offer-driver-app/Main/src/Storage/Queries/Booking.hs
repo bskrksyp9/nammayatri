@@ -25,7 +25,7 @@ import Kernel.Types.Id
 import Kernel.Types.Time
 import qualified Storage.Queries.DriverQuote as QDQuote
 import Storage.Tabular.Booking
-import Storage.Tabular.Booking.BookingLocation
+import Storage.Tabular.Booking.TripLocation
 import Storage.Tabular.DriverQuote as DriverQuote
 import qualified Storage.Tabular.FareParameters as Fare
 
@@ -40,14 +40,14 @@ create dBooking = Esq.runTransaction $
 baseBookingTable ::
   From
     ( Table BookingT
-        :& Table BookingLocationT
-        :& Table BookingLocationT
+        :& Table TripLocationT
+        :& Table TripLocationT
         :& Table Fare.FareParametersT
     )
 baseBookingTable =
   table @BookingT
-    `innerJoin` table @BookingLocationT `Esq.on` (\(rb :& loc1) -> rb ^. BookingFromLocationId ==. loc1 ^. BookingLocationTId)
-    `innerJoin` table @BookingLocationT `Esq.on` (\(rb :& _ :& loc2) -> rb ^. BookingToLocationId ==. loc2 ^. BookingLocationTId)
+    `innerJoin` table @TripLocationT `Esq.on` (\(rb :& loc1) -> rb ^. BookingFromLocationId ==. loc1 ^. TripLocationTId)
+    `innerJoin` table @TripLocationT `Esq.on` (\(rb :& _ :& loc2) -> rb ^. BookingToLocationId ==. loc2 ^. TripLocationTId)
     `innerJoin` table @Fare.FareParametersT
       `Esq.on` ( \(rb :& _ :& _ :& farePars) ->
                    rb ^. BookingFareParametersId ==. farePars ^. Fare.FareParametersTId
@@ -81,8 +81,8 @@ buildFullBooking ::
   BookingT ->
   DTypeBuilder m (Maybe (SolidType FullBookingT))
 buildFullBooking bookingT@BookingT {..} = runMaybeT $ do
-  fromLocationT <- MaybeT $ Esq.findById' @BookingLocationT (fromKey fromLocationId)
-  toLocationT <- MaybeT $ Esq.findById' @BookingLocationT (fromKey toLocationId)
+  fromLocationT <- MaybeT $ Esq.findById' @TripLocationT (fromKey fromLocationId)
+  toLocationT <- MaybeT $ Esq.findById' @TripLocationT (fromKey toLocationId)
   fareParamsT <- MaybeT $ Esq.findById' @Fare.FareParametersT (fromKey fareParametersId)
   return $ extractSolidType @Booking (bookingT, fromLocationT, toLocationT, fareParamsT)
 

@@ -18,6 +18,7 @@ module Storage.Queries.Ride where
 import qualified "dashboard-helper-api" Dashboard.ProviderPlatform.Ride as Common
 import Data.Time hiding (getCurrentTime)
 import Domain.Types.Booking as Booking
+import qualified Domain.Types.Booking.TripLocation as DBL
 import Domain.Types.Merchant
 import Domain.Types.Person
 import Domain.Types.Ride as Ride
@@ -365,3 +366,15 @@ findStuckRideItems merchantId bookingIds now = do
   pure $ mkStuckRideItem <$> res
   where
     mkStuckRideItem (rideId, bookingId, driverId, driverActive) = StuckRideItem {..}
+
+updateLocationIds :: Id Ride -> Id DBL.TripLocation -> Id DBL.TripLocation -> SqlDB ()
+updateLocationIds rideId fromLocationId toLocationId = do
+  now <- getCurrentTime
+  Esq.update $ \tbl -> do
+    set
+      tbl
+      [ RideFromLocationId =. val (toKey fromLocationId),
+        RideToLocationId =. val (toKey toLocationId),
+        RideUpdatedAt =. val now
+      ]
+    where_ $ tbl ^. RideTId ==. val (toKey rideId)

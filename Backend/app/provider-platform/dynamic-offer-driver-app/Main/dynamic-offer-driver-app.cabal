@@ -130,7 +130,7 @@ library
       Domain.Action.UI.Vehicle
       Domain.Action.UI.Whatsapp
       Domain.Types.Booking
-      Domain.Types.Booking.BookingLocation
+      Domain.Types.Booking.TripLocation
       Domain.Types.BookingCancellationReason
       Domain.Types.BusinessEvent
       Domain.Types.CallStatus
@@ -236,7 +236,7 @@ library
       Storage.CachedQueries.OnboardingDocumentConfig
       Storage.CachedQueries.SlabFarePolicy
       Storage.Queries.Booking
-      Storage.Queries.Booking.BookingLocation
+      Storage.Queries.Booking.TripLocation
       Storage.Queries.BookingCancellationReason
       Storage.Queries.BusinessEvent
       Storage.Queries.CallStatus
@@ -289,7 +289,7 @@ library
       Storage.Queries.SlabFarePolicy
       Storage.Queries.Vehicle
       Storage.Tabular.Booking
-      Storage.Tabular.Booking.BookingLocation
+      Storage.Tabular.Booking.TripLocation
       Storage.Tabular.BookingCancellationReason
       Storage.Tabular.BusinessEvent
       Storage.Tabular.CallStatus

@@ -21,6 +21,7 @@ import Data.OpenApi (ToSchema)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as DT
 import qualified Domain.Types.Booking as DRB
+import Domain.Types.Booking.TripLocation as DTripLocation
 import qualified Domain.Types.FareParameters as DFare
 import qualified Domain.Types.Person as DPers
 import EulerHS.Prelude hiding (id)
@@ -65,6 +66,8 @@ data Ride = Ride
     tripEndPos :: Maybe LatLong,
     fareParametersId :: Maybe (Id DFare.FareParameters),
     distanceCalculationFailed :: Maybe Bool,
+    fromLocationId :: Id DTripLocation.TripLocation,
+    toLocationId :: Id DTripLocation.TripLocation,
     createdAt :: UTCTime,
     updatedAt :: UTCTime
   }

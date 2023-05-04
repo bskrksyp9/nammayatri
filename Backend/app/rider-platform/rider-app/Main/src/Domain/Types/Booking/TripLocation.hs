@@ -12,15 +12,15 @@
  the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Domain.Types.Booking.BookingLocation where
+module Domain.Types.Booking.TripLocation where
 
 import Domain.Types.LocationAddress
 import Kernel.External.Maps.HasCoordinates
 import Kernel.Prelude
 import Kernel.Types.Id
 
-data BookingLocation = BookingLocation
-  { id :: Id BookingLocation,
+data TripLocation = TripLocation
+  { id :: Id TripLocation,
     lat :: Double,
     lon :: Double,
     address :: LocationAddress,
@@ -29,7 +29,7 @@ data BookingLocation = BookingLocation
   }
   deriving (Generic, Show, Eq, HasCoordinates)
 
-data BookingLocationAPIEntity = BookingLocationAPIEntity
+data TripLocationAPIEntity = TripLocationAPIEntity
   { lat :: Double,
     lon :: Double,
     street :: Maybe Text,
@@ -45,9 +45,9 @@ data BookingLocationAPIEntity = BookingLocationAPIEntity
   }
   deriving (Generic, FromJSON, ToJSON, Show, ToSchema)
 
-makeBookingLocationAPIEntity :: BookingLocation -> BookingLocationAPIEntity
-makeBookingLocationAPIEntity BookingLocation {..} = do
+makeTripLocationAPIEntity :: TripLocation -> TripLocationAPIEntity
+makeTripLocationAPIEntity TripLocation {..} = do
   let LocationAddress {..} = address
-  BookingLocationAPIEntity
+  TripLocationAPIEntity
     { ..
     }

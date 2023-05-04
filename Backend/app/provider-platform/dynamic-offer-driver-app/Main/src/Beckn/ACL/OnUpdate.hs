@@ -18,6 +18,8 @@ module Beckn.ACL.OnUpdate
   )
 where
 
+import Beckn.Types.Core.Taxi.Common.Address (Address (..))
+import Beckn.Types.Core.Taxi.Common.Gps (Gps (..))
 import qualified Beckn.Types.Core.Taxi.OnUpdate as OnUpdate
 import qualified Beckn.Types.Core.Taxi.OnUpdate.OnUpdateEvent.BookingCancelledEvent as BookingCancelledOU
 import qualified Beckn.Types.Core.Taxi.OnUpdate.OnUpdateEvent.DriverArrivedEvent as DriverArrivedOU
@@ -27,6 +29,7 @@ import Beckn.Types.Core.Taxi.OnUpdate.OnUpdateEvent.RideCompletedEvent as OnUpda
 import qualified Beckn.Types.Core.Taxi.OnUpdate.OnUpdateEvent.RideCompletedEvent as RideCompletedOU
 import qualified Beckn.Types.Core.Taxi.OnUpdate.OnUpdateEvent.RideStartedEvent as RideStartedOU
 import qualified Domain.Types.Booking as DRB
+import Domain.Types.Booking.TripLocation as DTripLocation
 import qualified Domain.Types.BookingCancellationReason as SBCR
 import qualified Domain.Types.Estimate as DEst
 import qualified Domain.Types.FareParameters as Fare
@@ -51,7 +54,9 @@ data OnUpdateBuildReq
       }
   | RideCompletedBuildReq
       { ride :: DRide.Ride,
-        fareParams :: Fare.FareParameters
+        fareParams :: Fare.FareParameters,
+        startLocation :: Maybe DTripLocation.TripLocation,
+        endLocation :: Maybe DTripLocation.TripLocation
       }
   | BookingCancelledBuildReq
       { booking :: DRB.Booking,
@@ -135,6 +140,8 @@ buildOnUpdateMessage req@RideCompletedBuildReq {} = do
             computed_value = fare
           }
       breakup = mkBreakupList (OnUpdate.BreakupPrice currency . fromIntegral) OnUpdate.BreakupItem req.fareParams
+      makeStartLocation = mkLocation <$> req.startLocation
+      makeEndLocation = mkLocation <$> req.endLocation
   return $
     OnUpdate.OnUpdateMessage $
       OnUpdate.RideCompleted
@@ -149,7 +156,9 @@ buildOnUpdateMessage req@RideCompletedBuildReq {} = do
             fulfillment =
               RideCompletedOU.FulfillmentInfo
                 { id = ride.id.getId,
-                  chargeable_distance = chargeableDistance
+                  chargeable_distance = chargeableDistance,
+                  start_location = makeStartLocation,
+                  end_location = makeEndLocation
                 }
           }
 buildOnUpdateMessage BookingCancelledBuildReq {..} = do
@@ -192,3 +201,18 @@ castCancellationSource = \case
   SBCR.ByMerchant -> BookingCancelledOU.ByMerchant
   SBCR.ByAllocator -> BookingCancelledOU.ByAllocator
   SBCR.ByApplication -> BookingCancelledOU.ByApplication
+
+mkLocation :: DTripLocation.TripLocation -> LocationInfo
+mkLocation DTripLocation.TripLocation {..} = do
+  let LocationAddress {..} = address
+  LocationInfo
+    { latLon = Gps {..},
+      address =
+        Address
+          { locality = address.area,
+            ward = Nothing,
+            area_code = address.areaCode,
+            door = Nothing,
+            ..
+          }
+    }

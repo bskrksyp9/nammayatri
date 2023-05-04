@@ -26,7 +26,7 @@ import Data.Coerce (coerce)
 import qualified Data.Text as T
 import qualified Data.Time as Time
 import qualified Domain.Types.Booking as DBooking
-import qualified Domain.Types.Booking.BookingLocation as DBLoc
+import qualified Domain.Types.Booking.TripLocation as DBLoc
 import qualified Domain.Types.BookingCancellationReason as DBCReason
 import qualified Domain.Types.CancellationReason as DCReason
 import qualified Domain.Types.Merchant as DM
@@ -47,6 +47,7 @@ import Kernel.Utils.Error.BaseError.HTTPError.BecknAPIError
 import qualified SharedLogic.CallBAP as CallBAP
 import SharedLogic.Merchant (findMerchantByShortId)
 import qualified Storage.Queries.Booking as QBooking
+import qualified Storage.Queries.Booking.TripLocation as QTripLoc
 import qualified Storage.Queries.BookingCancellationReason as QBCReason
 import qualified Storage.Queries.CallStatus as QCallStatus
 import qualified Storage.Queries.DriverLocation as QDrLoc
@@ -215,8 +216,8 @@ rideInfo merchantShortId reqRideId = do
         distanceCalculationFailed = ride.distanceCalculationFailed
       }
 
-mkLocationAPIEntity :: DBLoc.BookingLocation -> Common.LocationAPIEntity
-mkLocationAPIEntity DBLoc.BookingLocation {..} = do
+mkLocationAPIEntity :: DBLoc.TripLocation -> Common.LocationAPIEntity
+mkLocationAPIEntity DBLoc.TripLocation {..} = do
   let DBLoc.LocationAddress {..} = address
   Common.LocationAPIEntity {..}
 
@@ -297,8 +298,10 @@ syncCompletedRide ride booking = do
     logWarning "No fare params linked to ride. Using fare params linked to booking, they may be not actual"
   let fareParametersId = fromMaybe booking.fareParams.id ride.fareParametersId
   fareParameters <- runInReplica $ QFareParams.findById fareParametersId >>= fromMaybeM (FareParametersNotFound fareParametersId.getId)
-  handle (errHandler ride.status booking.status "ride completed") $
-    CallBAP.sendRideCompletedUpdateToBAP booking ride fareParameters
+  handle (errHandler ride.status booking.status "ride completed") $ do
+    fromLocation <- QTripLoc.findById ride.fromLocationId
+    toLocation <- QTripLoc.findById ride.toLocationId
+    CallBAP.sendRideCompletedUpdateToBAP booking ride fareParameters fromLocation toLocation
   pure $ Common.RideSyncRes Common.RIDE_COMPLETED "Success. Sent ride completed update to bap"
 
 errHandler :: DRide.RideStatus -> DBooking.BookingStatus -> Text -> SomeException -> Flow ()

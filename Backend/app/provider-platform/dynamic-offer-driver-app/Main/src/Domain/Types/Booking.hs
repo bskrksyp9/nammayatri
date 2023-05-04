@@ -20,7 +20,7 @@ import Data.OpenApi (ToSchema)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as DT
 import Data.Time
-import qualified Domain.Types.Booking.BookingLocation as DLoc
+import qualified Domain.Types.Booking.TripLocation as DLoc
 import Domain.Types.FareParameters (FareParameters)
 import qualified Domain.Types.Merchant as DM
 import qualified Domain.Types.RiderDetails as DRD
@@ -60,8 +60,8 @@ data Booking = Booking
     bapUri :: BaseUrl,
     startTime :: UTCTime,
     riderId :: Maybe (Id DRD.RiderDetails),
-    fromLocation :: DLoc.BookingLocation,
-    toLocation :: DLoc.BookingLocation,
+    fromLocation :: DLoc.TripLocation,
+    toLocation :: DLoc.TripLocation,
     vehicleVariant :: DVeh.Variant,
     estimatedDistance :: Meters,
     maxEstimatedDistance :: Maybe HighPrecMeters,
@@ -72,7 +72,7 @@ data Booking = Booking
     createdAt :: UTCTime,
     updatedAt :: UTCTime
   }
-  deriving (Generic)
+  deriving (Generic, Show)
 
 data BookingType = SpecialZoneBooking | NormalBooking
   deriving (Show, Eq, Ord, Read, Generic, ToJSON, FromJSON, ToSchema)

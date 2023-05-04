@@ -1,7 +1,7 @@
 module SharedLogic.Confirm where
 
 import qualified Domain.Types.Booking as DRB
-import qualified Domain.Types.Booking.BookingLocation as DBL
+import qualified Domain.Types.Booking.TripLocation as DBL
 import qualified Domain.Types.DriverOffer as DDriverOffer
 import qualified Domain.Types.Estimate as DEstimate
 import qualified Domain.Types.Exophone as DExophone
@@ -73,8 +73,8 @@ confirm personId quoteId = do
   unless (searchRequest.riderId == personId) $ throwError AccessDenied
   let fromLocation = searchRequest.fromLocation
       mbToLocation = searchRequest.toLocation
-  bFromLocation <- buildBookingLocation now fromLocation
-  mbBToLocation <- traverse (buildBookingLocation now) mbToLocation
+  bFromLocation <- buildTripLocation now fromLocation
+  mbBToLocation <- traverse (buildTripLocation now) mbToLocation
   exophone <- findRandomExophone searchRequest.merchantId
   booking <- buildBooking searchRequest quote bFromLocation mbBToLocation exophone now Nothing
   merchant <- CQM.findById booking.merchantId >>= fromMaybeM (MerchantNotFound booking.merchantId.getId)
@@ -109,8 +109,8 @@ buildBooking ::
   MonadFlow m =>
   DSReq.SearchRequest ->
   DQuote.Quote ->
-  DBL.BookingLocation ->
-  Maybe DBL.BookingLocation ->
+  DBL.TripLocation ->
+  Maybe DBL.TripLocation ->
   DExophone.Exophone ->
   UTCTime ->
   Maybe Text ->
@@ -168,11 +168,11 @@ findRandomExophone merchantId = do
     e : es -> pure $ e :| es
   getRandomElement nonEmptyExophones
 
-buildBookingLocation :: MonadGuid m => UTCTime -> DSRLoc.SearchReqLocation -> m DBL.BookingLocation
-buildBookingLocation now DSRLoc.SearchReqLocation {..} = do
+buildTripLocation :: MonadGuid m => UTCTime -> DSRLoc.SearchReqLocation -> m DBL.TripLocation
+buildTripLocation now DSRLoc.SearchReqLocation {..} = do
   locId <- generateGUID
   return
-    DBL.BookingLocation
+    DBL.TripLocation
       { id = locId,
         lat,
         lon,

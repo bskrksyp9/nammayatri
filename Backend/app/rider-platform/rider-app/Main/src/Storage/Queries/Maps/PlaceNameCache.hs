@@ -35,6 +35,16 @@ findPlaceByPlaceId placeId =
     where_ $ placeNameCache ^. PlaceNameCachePlaceId ==. val (Just placeId)
     return placeNameCache
 
+findPlaceByLatLong :: Transactionable m => Double -> Double -> m (Maybe PlaceNameCache)
+findPlaceByLatLong lat lon =
+  Esq.findOne $ do
+    placeNameCache <- from $ table @PlaceNameCacheT
+    where_ $
+      placeNameCache ^. PlaceNameCacheLat ==. val lat
+        &&. placeNameCache ^. PlaceNameCacheLat ==. val lon
+
+    return placeNameCache
+
 findPlaceByGeoHash :: Transactionable m => Text -> m [PlaceNameCache]
 findPlaceByGeoHash geoHash =
   Esq.findAll $ do

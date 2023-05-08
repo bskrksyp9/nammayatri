@@ -1,15 +1,15 @@
 {-
- 
+
   Copyright 2022-23, Juspay India Pvt Ltd
- 
+
   This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License
- 
+
   as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program
- 
+
   is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- 
+
   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details. You should have received a copy of
- 
+
   the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 -}
 
@@ -44,7 +44,7 @@ import Engineering.Helpers.Commons (liftFlow, os, bundleVersion, isPreviousVersi
 import Data.Array ((!!), take)
 import Language.Strings (getString)
 import Language.Types (STR(..))
-import Debug.Trace (spy)
+import Debug (spy)
 
 getHeaders :: String -> Flow GlobalState Headers
 getHeaders _ = do
@@ -83,6 +83,7 @@ getHeaders' _ = do
                                                 Header "x-device" (getValueToLocalNativeStore DEVICE_DETAILS)
                                                 ]
                                         )
+
 
 
 
@@ -185,7 +186,7 @@ triggerOTPBT payload = do
     errorHandler errorPayload = do
         let errResp = errorPayload.response
         let codeMessage = decodeErrorCode errResp.errorMessage
-        if (errorPayload.code == 429 && codeMessage == "HITS_LIMIT_EXCEED") then 
+        if (errorPayload.code == 429 && codeMessage == "HITS_LIMIT_EXCEED") then
             pure $ toast (getString LIMIT_EXCEEDED)
             else pure $ toast (getString ERROR_OCCURED)
         modifyScreenState $ ChooseLanguageScreenStateType (\chooseLanguage -> chooseLanguage { props {btnActive = false} })
@@ -234,7 +235,7 @@ verifyTokenBT payload token = do
                 pure $ toast "INVALID_AUTH_DATA"
             else if ( errorPayload.code == 429 && codeMessage == "HITS_LIMIT_EXCEED") then
                 pure $ toast (getString LIMIT_EXCEEDED)
-            else pure $ toast (getString ERROR_OCCURED)        
+            else pure $ toast (getString ERROR_OCCURED)
         BackT $ pure GoBack
 
 -- verifyTokenBT :: VerifyTokenReq -> String -> FlowBT String VerifyTokenResp
@@ -269,7 +270,7 @@ searchLocationBT payload = do
   headers <- getHeaders' ""
   withAPIResultBT (EP.autoComplete "") (\x → x) errorHandler (lift $ lift $ callAPI headers payload)
   where
-  errorHandler errorPayload  = do 
+  errorHandler errorPayload  = do
                 modifyScreenState $ HomeScreenStateType (\homeScreen -> homeScreen{props{currentStage  = SearchLocationModel}})
                 BackT $ pure GoBack
 
@@ -290,9 +291,9 @@ placeDetailsBT (PlaceDetailsReq id) = do
     headers <- lift $ lift $ getHeaders ""
     withAPIResultBT (EP.placeDetails id) (\x → x) errorHandler (lift $ lift $ callAPI headers (PlaceDetailsReq id))
     where
-    errorHandler errorPayload  = do 
+    errorHandler errorPayload  = do
         pure $ toast (getString ERROR_OCCURED)
-        _ <- lift $ lift $ toggleLoader false 
+        _ <- lift $ lift $ toggleLoader false
         BackT $ pure GoBack
 
 -- ------------------------------------------------------------------------ GetCoordinatesBT Function --------------------------------------------------------------------------------------
@@ -306,13 +307,13 @@ placeDetailsBT (PlaceDetailsReq id) = do
 
 ------------------------------------------------------------------------ RideSearchBT Function ----------------------------------------------------------------------------------------
 rideSearchBT :: SearchReq -> FlowBT String SearchRes
-rideSearchBT payload = do 
+rideSearchBT payload = do
         headers <- getHeaders' ""
         _ <- pure $ spy "" "req for searchid"
         withAPIResultBT (EP.searchReq "") (\x → x) errorHandler (lift $ lift $ callAPI headers payload)
     where
       errorHandler errorPayload = do
-            if errorPayload.code == 400 then 
+            if errorPayload.code == 400 then
                 pure $ toast (getString RIDE_NOT_SERVICEABLE)
               else pure $ toast (getString ERROR_OCCURED)
             modifyScreenState $ HomeScreenStateType (\homeScreen -> homeScreen {props{currentStage = SearchLocationModel}})
@@ -321,7 +322,7 @@ rideSearchBT payload = do
 
 
 makeRideSearchReq :: Number -> Number -> Number -> Number -> Address -> Address -> SearchReq
-makeRideSearchReq slat slong dlat dlong srcAdd desAdd= 
+makeRideSearchReq slat slong dlat dlong srcAdd desAdd=
      SearchReq { "contents" : OneWaySearchReq{
                                                "destination" : SearchReqLocation {
                                                         "gps" : LatLong {
@@ -334,22 +335,22 @@ makeRideSearchReq slat slong dlat dlong srcAdd desAdd=
                                                 "gps" : LatLong {
                                                             "lat" : slat ,
                                                             "lon" : slong
-                                                },"address" : (LocationAddress srcAdd)            
+                                                },"address" : (LocationAddress srcAdd)
                                                }
                                               },
-                 "fareProductType" : "ONE_WAY"                           
+                 "fareProductType" : "ONE_WAY"
                 }
 
 
 ------------------------------------------------------------------------ GetQuotes Function -------------------------------------------------------------------------------------------
-getQuotes searchId = do 
+getQuotes searchId = do
         headers <- getHeaders ""
         withAPIResult (EP.getQuotes searchId) unwrapResponse $ callAPI headers (GetQuotesReq searchId)
     where
         unwrapResponse (x) = x
 
 ------------------------------------------------------------------------ RideConfirm Function ---------------------------------------------------------------------------------------
-rideConfirm quoteId = do 
+rideConfirm quoteId = do
         headers <- getHeaders ""
         withAPIResult (EP.confirmRide quoteId) unwrapResponse $ callAPI headers (ConfirmRequest quoteId)
     where
@@ -358,7 +359,7 @@ rideConfirm quoteId = do
 ------------------------------------------------------------------------ SelectEstimateBT Function ------------------------------------------------------------------------------------
 
 selectEstimateBT :: DEstimateSelect -> String -> FlowBT String SelectEstimateRes
-selectEstimateBT payload estimateId = do 
+selectEstimateBT payload estimateId = do
         headers <- getHeaders' ""
         withAPIResultBT (EP.selectEstimate estimateId) (\x → x) errorHandler (lift $ lift $ callAPI headers (SelectEstimateReq estimateId payload))
     where
@@ -373,14 +374,14 @@ makeEstimateSelectReq isAutoAssigned tipForDriver= DEstimateSelect {
     }
 
 ------------------------------------------------------------------------ SelectList Function ------------------------------------------------------------------------------------------
-selectList estimateId = do 
+selectList estimateId = do
         headers <- getHeaders ""
         withAPIResult (EP.selectList estimateId) unwrapResponse $ callAPI headers (SelectListReq estimateId)
     where
         unwrapResponse (x) = x
 
 ------------------------------------------------------------------------ RideBooking Function -----------------------------------------------------------------------------------------
-rideBooking bookingId = do 
+rideBooking bookingId = do
         headers <- getHeaders ""
         withAPIResult (EP.ridebooking bookingId) unwrapResponse $ callAPI headers (RideBookingReq bookingId)
     where
@@ -388,16 +389,16 @@ rideBooking bookingId = do
 
 ------------------------------------------------------------------------ CancelRideBT Function ----------------------------------------------------------------------------------------
 cancelRideBT :: CancelReq -> String -> FlowBT String CancelRes
-cancelRideBT payload bookingId = do 
+cancelRideBT payload bookingId = do
         headers <- getHeaders' ""
         withAPIResultBT (EP.cancelRide bookingId) (\x → x) errorHandler (lift $ lift $ callAPI headers (CancelRequest payload bookingId))
     where
       errorHandler errorPayload = do
             BackT $ pure GoBack
-        
-makeCancelRequest :: HomeScreenState -> CancelReq 
+
+makeCancelRequest :: HomeScreenState -> CancelReq
 makeCancelRequest state = CancelReq {
-    "additionalInfo" : Just state.props.cancelDescription     
+    "additionalInfo" : Just state.props.cancelDescription
   , "reasonCode" : state.props.cancelReasonCode
   , "reasonStage" : "OnAssign"
   }
@@ -416,7 +417,7 @@ callDriverBT rideId = do
 ------------------------------------------------------------------------ Feedback Function --------------------------------------------------------------------------------------------
 
 rideFeedbackBT :: FeedbackReq -> FlowBT String FeedbackRes
-rideFeedbackBT payload = do 
+rideFeedbackBT payload = do
     headers <- getHeaders' ""
     withAPIResultBT (EP.feedback "") (\x → x) errorHandler (lift $ lift $ callAPI headers payload)
     where
@@ -424,22 +425,22 @@ rideFeedbackBT payload = do
             BackT $ pure GoBack
 
 makeFeedBackReq :: Int -> String -> String -> FeedbackReq
-makeFeedBackReq rating rideId feedback = FeedbackReq 
+makeFeedBackReq rating rideId feedback = FeedbackReq
     {   "rating" : rating
     ,   "rideId" : rideId
-    ,   "feedbackDetails" : feedback 
+    ,   "feedbackDetails" : feedback
     }
 
 
 ----------------------------------------------------------------------- RideBooking BT Function ---------------------------------------------------------------------------------------
 rideBookingBT :: String -> FlowBT String RideBookingRes
-rideBookingBT bookingId = do 
+rideBookingBT bookingId = do
         headers <- getHeaders' ""
         withAPIResultBT (EP.ridebooking bookingId) (\x → x) errorHandler (lift $ lift $ callAPI headers  (RideBookingReq bookingId))
     where
         errorHandler errorPayload = do
             BackT $ pure GoBack
-        
+
 rideBookingList limit offset onlyActive = do
         headers <- getHeaders ""
         withAPIResult (EP.rideBookingList limit offset onlyActive)  unwrapResponse $ callAPI headers (RideBookingListReq limit offset onlyActive)
@@ -452,7 +453,7 @@ getProfileBT _  = do
         headers <- getHeaders' ""
         withAPIResultBT (EP.profile "") (\x → x) errorHandler (lift $ lift $ callAPI headers (GetProfileReq))
     where
-    errorHandler (errorPayload) =  do 
+    errorHandler (errorPayload) =  do
         BackT $ pure GoBack
 
 -- updateProfileBT :: UpdateProfileReq -> FlowBT String UpdateProfileRes
@@ -463,7 +464,7 @@ updateProfile (UpdateProfileReq payload) = do
         unwrapResponse (x) = x
 
 makeUpdateProfileRequest :: Maybe String -> Maybe String -> Maybe String -> UpdateProfileReq
-makeUpdateProfileRequest name gender referralCode = 
+makeUpdateProfileRequest name gender referralCode =
     UpdateProfileReq{
           middleName : Nothing
         , lastName : Nothing
@@ -482,7 +483,7 @@ makeUpdateProfileRequest name gender referralCode =
     }
 
 editProfileRequest :: Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> UpdateProfileReq
-editProfileRequest firstName middleName lastName emailID gender = 
+editProfileRequest firstName middleName lastName emailID gender =
     UpdateProfileReq{
           middleName : middleName
         , lastName : lastName
@@ -508,7 +509,7 @@ makeUpdateLanguageRequest _ = UpdateProfileReq{
         , firstName : Nothing
         , email : Nothing
         , referralCode : Nothing
-        , gender : Nothing 
+        , gender : Nothing
         , language : Just case getValueToLocalNativeStore LANGUAGE_KEY of
             "EN_US" -> "ENGLISH"
             "KN_IN" -> "KANNADA"
@@ -620,7 +621,7 @@ getDriverLocationBT rideId = do
       errorHandler errorPayload = do
             BackT $ pure GoBack
 
-getDriverLocation rideId = do 
+getDriverLocation rideId = do
         headers <- getHeaders ""
         withAPIResult (EP.getCurrentLocation rideId) unwrapResponse $ callAPI headers (GetDriverLocationReq rideId)
     where
@@ -633,37 +634,37 @@ getRoute routeState payload = do
         unwrapResponse (x) = x
 
 addSavedLocationBT :: SavedReqLocationAPIEntity -> FlowBT String AddLocationResp
-addSavedLocationBT payload = do 
+addSavedLocationBT payload = do
     headers <- getHeaders' ""
     withAPIResultBT (EP.addLocation "") (\x -> x) errorHandler (lift $ lift $ callAPI headers payload)
-    where 
-    errorHandler errorPayload = do 
+    where
+    errorHandler errorPayload = do
             BackT $ pure GoBack
 
 getSavedLocationBT :: SavedLocationReq -> FlowBT String SavedLocationsListRes
-getSavedLocationBT payload = do 
+getSavedLocationBT payload = do
     headers <- getHeaders' ""
     withAPIResultBT (EP.savedLocation "") (\x -> x) errorHandler (lift $ lift $ callAPI headers payload)
     where
-    errorHandler errorPayload = do 
+    errorHandler errorPayload = do
             BackT $ pure GoBack
 
-getSavedLocationList payload = do 
+getSavedLocationList payload = do
         headers <- getHeaders ""
         withAPIResult (EP.savedLocation "") unwrapResponse $ callAPI headers (SavedLocationReq)
-    where 
+    where
         unwrapResponse (x) = x
 
 deleteSavedLocationBT :: DeleteSavedLocationReq -> FlowBT String DeleteSavedLocationRes
-deleteSavedLocationBT (DeleteSavedLocationReq tag) = do 
+deleteSavedLocationBT (DeleteSavedLocationReq tag) = do
     headers <- getHeaders' ""
     withAPIResultBT (EP.deleteLocation tag) (\x -> x) errorHandler (lift $ lift $ callAPI headers (DeleteSavedLocationReq tag))
     where
-    errorHandler errorPayload = do 
+    errorHandler errorPayload = do
             BackT $ pure GoBack
 
 sendIssueBT :: SendIssueReq -> FlowBT String SendIssueRes
-sendIssueBT req = do 
+sendIssueBT req = do
     headers <- getHeaders' ""
     withAPIResultBT ((EP.sendIssue "" )) (\x → x) errorHandler (lift $ lift $ callAPI headers req)
     where
@@ -671,16 +672,16 @@ sendIssueBT req = do
             BackT $ pure GoBack
 
 ----------------------------------------------------------------------------------------------
-drawMapRoute :: Number -> Number -> Number -> Number -> Markers -> String -> String -> String -> Maybe Route -> String -> FlowBT String (Maybe Route) 
-drawMapRoute srcLat srcLng destLat destLng markers routeType srcAddress destAddress existingRoute routeAPIType= do 
+drawMapRoute :: Number -> Number -> Number -> Number -> Markers -> String -> String -> String -> Maybe Route -> String -> FlowBT String (Maybe Route)
+drawMapRoute srcLat srcLng destLat destLng markers routeType srcAddress destAddress existingRoute routeAPIType= do
     _ <- pure $ removeAllPolylines ""
     case existingRoute of
-        Just (Route route) -> do 
+        Just (Route route) -> do
             let (Snapped points) = route.points
             case points of
                 [] -> do
                     (GetRouteResp routeResponse) <- getRouteBT routeAPIType (makeGetRouteReq srcLat srcLng destLat destLng)
-                    callDrawRoute ((routeResponse) !! 0)    
+                    callDrawRoute ((routeResponse) !! 0)
                 _  -> callDrawRoute existingRoute
         Nothing -> do
             (GetRouteResp routeResponse) <- getRouteBT routeAPIType (makeGetRouteReq srcLat srcLng destLat destLng)
@@ -688,9 +689,9 @@ drawMapRoute srcLat srcLng destLat destLng markers routeType srcAddress destAddr
             let ios = (os == "IOS")
             let route = ((routeResponse) !! 0)
             callDrawRoute route
-    where 
-        callDrawRoute :: Maybe Route -> FlowBT String (Maybe Route) 
-        callDrawRoute route = 
+    where
+        callDrawRoute :: Maybe Route -> FlowBT String (Maybe Route)
+        callDrawRoute route =
             case route of
                 Just (Route routes) ->
                     if (routes.distance <= 50000) then do
@@ -703,7 +704,7 @@ drawMapRoute srcLat srcLng destLat destLng markers routeType srcAddress destAddr
 
 type Markers = {
     srcMarker :: String,
-    destMarker :: String  
+    destMarker :: String
 }
 
 driverTracking :: String -> Markers
@@ -732,11 +733,11 @@ makeSendIssueReq email bookingId reason description= SendIssueReq {
     "issue" : Issue {
             "reason" : reason,
             "description" : description
-        }    
+        }
 }
 
 originServiceabilityBT :: ServiceabilityReq -> FlowBT String ServiceabilityRes
-originServiceabilityBT req = do 
+originServiceabilityBT req = do
     headers <- getHeaders' ""
     withAPIResultBT ((EP.serviceabilityOrigin "" )) (\x → x) errorHandler (lift $ lift $ callAPI headers req)
     where
@@ -744,7 +745,7 @@ originServiceabilityBT req = do
             BackT $ pure GoBack
 
 destServiceabilityBT :: ServiceabilityReq -> FlowBT String ServiceabilityRes
-destServiceabilityBT req = do 
+destServiceabilityBT req = do
     headers <- getHeaders' ""
     withAPIResultBT ((EP.serviceabilityDest "" )) (\x → x) errorHandler (lift $ lift $ callAPI headers req)
     where
@@ -761,14 +762,14 @@ makeServiceabilityReq latitude longitude = ServiceabilityReq {
 
 ---------------------------------------------------------------- flowStatus function -------------------------------------------------------------------
 flowStatusBT :: String -> FlowBT String FlowStatusRes
-flowStatusBT dummy = do 
+flowStatusBT dummy = do
         headers <- getHeaders' ""
         withAPIResultBT (EP.flowStatus "") (\x → x) errorHandler (lift $ lift $ callAPI headers FlowStatusReq)
     where
         errorHandler errorPayload = do
             BackT $ pure GoBack
 
----------------------------------------------------------------- notifyFlowEvent function -------------------------------------------------------------------            
+---------------------------------------------------------------- notifyFlowEvent function -------------------------------------------------------------------
 
 notifyFlowEvent requestBody = do
     headers <- getHeaders ""
@@ -795,7 +796,7 @@ cancelEstimate estimateId = do
         unwrapResponse (x) = x
 
 cancelEstimateBT :: String -> FlowBT String CancelEstimateRes
-cancelEstimateBT estimateId = do 
+cancelEstimateBT estimateId = do
         headers <- getHeaders' ""
         withAPIResultBT (EP.cancelEstimate estimateId) (\x → x) errorHandler (lift $ lift $ callAPI headers (CancelEstimateReq estimateId))
     where
@@ -831,4 +832,4 @@ createUserSosFlow tag content = UserSosFlow {
 makeSosStatus :: String -> SosStatus
 makeSosStatus sosStatus = SosStatus {
      "status" : sosStatus
-} 
+}

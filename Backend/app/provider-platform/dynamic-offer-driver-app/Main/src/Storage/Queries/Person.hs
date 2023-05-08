@@ -125,18 +125,18 @@ findAllDriversWithInfoAndVehicle merchantId limitVal offsetVal mbVerified mbEnab
     offset $ fromIntegral offsetVal
     pure (person, info, mbVeh)
 
-countDrivers :: Transactionable m => Id Merchant -> m Int
-countDrivers merchantId =
-  mkCount <$> do
-    Esq.findAll $ do
-      person <- from $ table @PersonT
-      where_ $
-        person ^. PersonMerchantId ==. val (toKey merchantId)
-          &&. person ^. PersonRole ==. val Person.DRIVER
-      return (countRows :: SqlExpr (Esq.Value Int))
-  where
-    mkCount [counter] = counter
-    mkCount _ = 0
+-- countDrivers :: Transactionable m => Id Merchant -> m Int
+-- countDrivers merchantId =
+--   mkCount <$> do
+--     Esq.findAll $ do
+--       person <- from $ table @PersonT
+--       where_ $
+--         person ^. PersonMerchantId ==. val (toKey merchantId)
+--           &&. person ^. PersonRole ==. val Person.DRIVER
+--       return (countRows :: SqlExpr (Esq.Value Int))
+--   where
+--     mkCount [counter] = counter
+--     mkCount _ = 0
 
 findAllDriversByIdsFirstNameAsc ::
   (Transactionable m, Functor m) =>
@@ -164,18 +164,28 @@ data DriverWithRidesCount = DriverWithRidesCount
 mkDriverWithRidesCount :: (Person, DriverInformation, Maybe Vehicle, Maybe Int) -> DriverWithRidesCount
 mkDriverWithRidesCount (person, info, vehicle, ridesCount) = DriverWithRidesCount {..}
 
-ridesCountAggTable :: SqlQuery (From (SqlExpr (Value PersonTId), SqlExpr (Value Int)))
-ridesCountAggTable = with $ do
-  ride <- from $ table @RideT
-  where_ (not_ $ ride ^. RideStatus `in_` valList [Ride.NEW, Ride.CANCELLED])
-  groupBy $ ride ^. RideDriverId
-  pure (ride ^. RideDriverId, count @Int $ ride ^. RideId)
+fetchDriverInfoWithRidesCount :: (Transactionable m, MonadTime m) => Id Merchant -> Maybe (DbHash, Text) -> Maybe Text -> Maybe DbHash -> Maybe DbHash -> m (Maybe DriverWithRidesCount)
+fetchDriverInfoWithRidesCount merchantId mbMobileNumberDbHashWithCode mbVehicleNumber mbDlNumberHash mbRcNumberHash = do
+  mbDriverInfo <- fetchDriverInfo merchantId mbMobileNumberDbHashWithCode mbVehicleNumber mbDlNumberHash mbRcNumberHash
+  addRidesCount `mapM` mbDriverInfo
+  where
+    addRidesCount :: Transactionable m => (Person, DriverInformation, Maybe Vehicle) -> m DriverWithRidesCount
+    addRidesCount (person, info, vehicle) = do
+      ridesCount <-
+        Esq.findOne $ do
+          ride <- from $ table @RideT
+          where_ $
+            ride ^. RideDriverId ==. val (toKey person.id)
+              &&. not_ (ride ^. RideStatus `in_` valList [Ride.NEW, Ride.CANCELLED])
+          groupBy $ ride ^. RideDriverId
+          return (count @Int $ ride ^. RideId)
+      return $ mkDriverWithRidesCount (person, info, vehicle, ridesCount)
 
-fetchDriverInfoWithRidesCount :: Transactionable m => Id Merchant -> Maybe (DbHash, Text) -> Maybe Text -> Maybe DbHash -> Maybe DbHash -> m (Maybe DriverWithRidesCount)
-fetchDriverInfoWithRidesCount merchantId mbMobileNumberDbHashWithCode mbVehicleNumber mbDlNumberHash mbRcNumberHash = fmap (fmap mkDriverWithRidesCount) $ do
+fetchDriverInfo :: (Transactionable m, MonadTime m) => Id Merchant -> Maybe (DbHash, Text) -> Maybe Text -> Maybe DbHash -> Maybe DbHash -> m (Maybe (Person, DriverInformation, Maybe Vehicle))
+fetchDriverInfo merchantId mbMobileNumberDbHashWithCode mbVehicleNumber mbDlNumberHash mbRcNumberHash = do
+  now <- getCurrentTime
   Esq.findOne $ do
-    ridesCountAggQuery <- ridesCountAggTable
-    person :& driverInfo :& mbVehicle :& mbDriverLicense :& _mbRcAssoc :& mbRegCert :& (_, mbRidesCount) <-
+    person :& driverInfo :& mbVehicle :& mbDriverLicense :& _mbRcAssoc :& mbRegCert <-
       from $
         table @PersonT
           `innerJoin` table @DriverInformationT
@@ -193,16 +203,14 @@ fetchDriverInfoWithRidesCount merchantId mbMobileNumberDbHashWithCode mbVehicleN
           `leftJoin` table @DriverRCAssociationT
           `Esq.on` ( \(person :& _ :& _ :& _ :& mbRcAssoc) ->
                        joinOnlyWhenJust mbRcNumberHash $
-                         just (person ^. PersonTId) ==. mbRcAssoc ?. DriverRCAssociationDriverId
+                         do
+                           just (person ^. PersonTId) ==. mbRcAssoc ?. DriverRCAssociationDriverId
+                           &&. just (just (val now)) <. mbRcAssoc ?. DriverRCAssociationAssociatedTill
                    )
           `leftJoin` table @VehicleRegistrationCertificateT
           `Esq.on` ( \(_ :& _ :& _ :& _ :& mbRcAssoc :& mbRegCert) ->
                        joinOnlyWhenJust mbRcNumberHash $
                          mbRcAssoc ?. DriverRCAssociationRcId ==. mbRegCert ?. VehicleRegistrationCertificateTId
-                   )
-          `leftJoin` ridesCountAggQuery
-          `Esq.on` ( \(person :& _ :& _ :& _ :& _ :& _ :& (mbPersonId, _mbRidesCount)) ->
-                       just (person ^. PersonTId) ==. mbPersonId
                    )
     where_ $
       person ^. PersonMerchantId ==. (val . toKey $ merchantId)
@@ -216,7 +224,7 @@ fetchDriverInfoWithRidesCount merchantId mbMobileNumberDbHashWithCode mbVehicleN
         &&. whenJust_ mbVehicleNumber (\vehicleNumber -> mbVehicle ?. VehicleRegistrationNo ==. just (val vehicleNumber))
         &&. whenJust_ mbDlNumberHash (\dlNumberHash -> mbDriverLicense ?. DriverLicenseLicenseNumberHash ==. just (val dlNumberHash))
         &&. whenJust_ mbRcNumberHash (\rcNumberHash -> mbRegCert ?. VehicleRegistrationCertificateCertificateNumberHash ==. just (val rcNumberHash))
-    pure (person, driverInfo, mbVehicle, mbRidesCount)
+    pure (person, driverInfo, mbVehicle)
   where
     -- used only for dl and rc entites, because they are not required for final result, only for filters
     joinOnlyWhenJust mbFilter cond = maybe (val False) (const cond) mbFilter

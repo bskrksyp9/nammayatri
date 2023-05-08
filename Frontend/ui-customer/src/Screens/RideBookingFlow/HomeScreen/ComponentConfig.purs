@@ -251,7 +251,7 @@ primaryButtonRequestRideConfig state =
           , textSize = FontSize.a_16
           }
         , background = Color.black900
-        , margin = (Margin 0 32 0 15)
+        , margin = (Margin 0 32 0 0)
         , id = "RequestRideButton"
         , enableLoader = (JB.getBtnLoader "RequestRideButton")
         }
@@ -383,11 +383,12 @@ logOutPopUpModelConfig state =
           , width = MATCH_PARENT 
           , background = Color.white900
           , strokeColor = Color.white900
-          , margin = MarginTop 3
+          , margin = MarginTop 14
+          , padding = PaddingBottom $ getBottomMargin
           , color = Color.black650
           , fontStyle = FontStyle.semiBold LanguageStyle
           },
-          cornerRadius = (Corners 15.0 true true true true)
+          cornerRadius = (Corners 15.0 true true false false)
 
       }
     _ ->
@@ -416,13 +417,18 @@ logOutPopUpModelConfig state =
               , width = MATCH_PARENT 
               , background = Color.white900
               , strokeColor = Color.white900
-              , margin = MarginTop 3
+              , margin = MarginTop $ if (isLocalStageOn ST.QuoteList || isLocalStageOn ST.FindingQuotes) then 14 else 3
               , color = Color.black650
+              , padding = if (isLocalStageOn ST.QuoteList || isLocalStageOn ST.FindingQuotes) then (PaddingBottom getBottomMargin) else (Padding 0 0 0 0)
               , fontStyle = FontStyle.semiBold LanguageStyle
              }
             }
       in
         popUpConfig'
+
+
+getBottomMargin :: Int 
+getBottomMargin = if EHC.safeMarginBottom == 0 then 24 else (EHC.safeMarginBottom)
 
 distanceOusideLimitsConfig :: ST.HomeScreenState -> PopUpModal.Config
 distanceOusideLimitsConfig state =
@@ -477,8 +483,7 @@ sourceUnserviceableConfig state =
     config = ErrorModal.config
     errorModalConfig' =
       config
-        { height = WRAP_CONTENT
-        , gravity = BOTTOM
+        { height = MATCH_PARENT
         , background = Color.white900
         , stroke = ("1," <> Color.borderGreyColor)
         , corners = (Corners 20.0 true true false false)
@@ -490,7 +495,7 @@ sourceUnserviceableConfig state =
           }
         , errorConfig
           { text = (getString LOCATION_UNSERVICEABLE)
-          , textSize = FontSize.a_18
+          , textSize = FontSize.a_22
           , color = Color.black800
           , margin = (MarginBottom 5)
           , fontStyle = FontStyle.bold LanguageStyle
@@ -498,7 +503,7 @@ sourceUnserviceableConfig state =
         , errorDescriptionConfig
           { text = (getString CURRENTLY_WE_ARE_LIVE_IN_)
           , color = Color.black700
-          , textSize = FontSize.a_14
+          , textSize = FontSize.a_16
           , margin = (Margin 20 0 20 (40 + EHC.safeMarginBottom))
           , fontStyle = FontStyle.regular LanguageStyle
           }
@@ -509,6 +514,7 @@ sourceUnserviceableConfig state =
           , fontStyle = FontStyle.medium LanguageStyle
           , background = Color.black900
           , color = Color.yellow900
+          , visibility = GONE
           }
         }
   in
@@ -697,3 +703,33 @@ autoAnimConfig =
         }
   in
     autoAnimConfig'
+
+callSupportConfig :: ST.HomeScreenState ->  PopUpModal.Config
+callSupportConfig state = let
+  config' = PopUpModal.config
+  popUpConfig' = config'{
+    gravity = CENTER
+  , cornerRadius = (Corners 15.0 true true true true)
+  , margin = (MarginHorizontal 16 16)
+  , primaryText {
+      text = getString CONTACT_SUPPORT <>"?"
+    , fontStyle = FontStyle.semiBold LanguageStyle
+    }
+  , secondaryText {
+      text = getString YOU_ARE_ABOUT_TO_CALL_NAMMA_YATRI_SUPPORT
+    , margin = (Margin 24 12 24 32)
+    , color = Color.black700
+    }
+  , option1 {
+      text =  getString CANCEL_
+    , fontSize = FontSize.a_16
+    , color = Color.black700
+    , strokeColor = Color.black700
+    }
+  , option2 {
+      text =  getString CALL_SUPPORT
+    , fontSize = FontSize.a_16
+    , margin = (MarginLeft 12)
+    }
+  }
+  in popUpConfig'

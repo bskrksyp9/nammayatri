@@ -25,6 +25,7 @@ import Effect (Effect)
 import Engineering.Helpers.Commons (screenWidth)
 import Font.Size as FontSize
 import Font.Style as FontStyle
+import Helpers.Utils (toString)
 import Language.Types (STR(..))
 import Prelude (Unit, const, map, unit, ($), (/), (<>), (==), (||), (>=), (&&), (<), not)
 import PrestoDOM (Gravity(..), Length(..), Margin(..), Orientation(..), Padding(..), PrestoDOM, Visibility(..), imageUrl, imageView, linearLayout, onBackPressed, onClick, textView, alpha)
@@ -35,6 +36,8 @@ import Styles.Colors as Color
 import Debug (spy)
 import Screens.Types(KeyboardModalType(..))
 import Language.Strings (getString)
+import Constant.Test as Id
+import EN
 
 view :: forall w . (Action -> Effect Unit) -> InAppKeyboardModalState -> PrestoDOM (Effect Unit) w
 view push state =
@@ -73,6 +76,7 @@ view push state =
                     , height (V 35)
                     , imageWithFallback "ny_ic_chevron_left,https://assets.juspay.in/nammayatri/images/common/ny_ic_chevron_left.png"
                     , onClick push (const BackPressed)
+                    , Id.testId $ Id.Object Id.backIcon
                     , padding (Padding 5 5 5 5)
                     ]
                   , textView
@@ -120,6 +124,7 @@ textBoxes push state =
       , stroke ("1," <> if (state.otpIncorrect || state.otpAttemptsExceeded ) then Color.textDanger else if state.inputTextConfig.focusIndex == index then Color.highlightBorderColor else Color.borderColorLight )
       , margin (Margin ((screenWidth unit)/30) 0 ((screenWidth unit)/30) 0)
       , onClick push (const (OnclickTextBox index))
+      , Id.testId $ Id.TextField (toString(index))
       ]) [1,2,3,4])
 
 singleTextBox :: forall w . (Action -> Effect Unit) -> InAppKeyboardModalState -> PrestoDOM (Effect Unit) w
@@ -207,6 +212,7 @@ otpView push state =
                       , color Color.blue900
                       , margin (Margin 0 0 0 0)
                       , onClick push (const (OnClickResendOtp))
+                      , Id.testId $ Id.Text (getEN RESEND_OTP)
                       , visibility if (state.modalType == OTP && state.showResendOtpButton && (not state.otpAttemptsExceeded)) then VISIBLE else GONE
                       ]
                     )])
@@ -249,6 +255,7 @@ keyboard push state =
            , onClick push if key == "back" then (const (OnClickBack state.inputTextConfig.text)) else (const (OnClickDone state.inputTextConfig.text))
            , clickable if key == "back" then true else
                       if ((length state.inputTextConfig.text == 4  && state.modalType == OTP && state.otpIncorrect == false) || (length state.inputTextConfig.text == 10  && state.modalType == MOBILE__NUMBER && state.isValidAlternateNumber==true)) then true else false
+           , Id.testId $ Id.Object if key == "back" then Id.backSpace else Id.done
            ][
                 if key == "back" then
                 imageView
@@ -274,6 +281,7 @@ keyboard push state =
            , background Color.white900
            , cornerRadius 4.0
            , onClick push (const (OnSelection key state.inputTextConfig.focusIndex))
+           , Id.testId $ Id.Element (toString(index))
            ][  textView
                [ width WRAP_CONTENT
                , height MATCH_PARENT

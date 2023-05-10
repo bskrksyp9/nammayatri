@@ -37,9 +37,9 @@ import Effect.Class (liftEffect)
 import Data.Maybe
 import Log (printLog)
 import Data.String as DS
-import Constant.Test as Id
 import Common.Types.App
 import Screens.UploadDrivingLicenseScreen.ComponentConfig
+import Constant.Test as Id
 import EN
 
 screen :: ST.UploadDrivingLicenseState -> Screen Action ST.UploadDrivingLicenseState ScreenOutput

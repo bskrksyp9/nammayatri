@@ -36,11 +36,11 @@ import Language.Strings (getString)
 import Language.Types (STR(..))
 import Effect.Class(liftEffect)
 import Data.String as DS
-import Constant.Test as Id
 import Data.Maybe
 import Common.Types.App
 import Screens.AddVehicleDetailsScreen.ComponentConfig
 import Components.ReferralMobileNumber as ReferralMobileNumber
+import Constant.Test as Id
 import EN
 
 screen :: AddVehicleDetailsScreenState -> Screen Action AddVehicleDetailsScreenState ScreenOutput

@@ -193,7 +193,7 @@ otpAndWaitView push state =
             , linearLayout
               [ height WRAP_CONTENT
               , width WRAP_CONTENT
-              ] (map(\item ->
+              ] (Array.mapWithIndex(\index item ->
                   linearLayout
                     [ height $ V 32
                     , width $ V 32
@@ -379,6 +379,7 @@ contactView push state =
           , cornerRadius 20.0
           , background Color.green200
           , onClick push (const MessageDriver)
+          , Id.testId $ Id.Object if state.props.unReadMessages then Id.messageReceivedIcon else Id.callMessageIcon
           ][ imageView
               [ imageWithFallback if state.props.unReadMessages then "ic_chat_badge_green,https://assets.juspay.in/nammayatri/images/user/ic_chat_badge_green.png" else "ic_call_msg,https://assets.juspay.in/nammayatri/images/user/ic_call_msg.png"
               , height $ V 24

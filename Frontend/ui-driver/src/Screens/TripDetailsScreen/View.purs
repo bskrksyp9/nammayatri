@@ -402,10 +402,10 @@ reportIssueView state push =
                        , background Color.white900
                        , fontStyle $ FontStyle.bold LanguageStyle
                        , text ""
-                       , hint "You can describe the issue you faced here"
+                       , hint (getString YOU_CAN_DESCRIBE_THE_ISSUE_YOU_FACED_HERE)
                        , pattern "[A-Za-z0-9 ]*,255"
                        , onChange push $ MessageTextChanged
-                       , Id.testId $ Id.TextField "You can describe the issue you faced here"
+                       , Id.testId $ Id.TextField (getEN YOU_CAN_DESCRIBE_THE_ISSUE_YOU_FACED_HERE)
                        ]
                      ]  
                 ]

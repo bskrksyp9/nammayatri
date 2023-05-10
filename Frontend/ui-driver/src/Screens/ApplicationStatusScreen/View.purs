@@ -212,7 +212,6 @@ detailsView state config push =
       , margin (MarginTop 8)
       , fontStyle $ FontStyle.medium LanguageStyle
       , onClick push (const $ ReTry config.docType)
-      , Id.testId $ Id.Text (getEN TRY_AGAIN)
       , Id.testId $ Id.Button $ Id.BtnConfig (getEN TRY_AGAIN)
       , visibility if (config.status == "PENDING" || config.status == "VALID" || config.status == "INVALID") then GONE else VISIBLE -- $ if (config.verificationStatus == "PENDING") then GONE  else VISIBLE
       , lineHeight "18"

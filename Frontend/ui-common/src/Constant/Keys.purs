@@ -279,6 +279,33 @@ enabled = "enabled"
 disabled :: String
 disabled = "disabled"
 
+chatView :: String
+chatView = "chatView"
+
+navigate :: String
+navigate = "navigate"
+
+chatInput :: String
+chatInput = "chatInput"
+
+send :: String
+send = "send"
+
+tip :: String
+tip = "tip"
+
+subText :: String
+subText = "subText"
+
+messageIcon :: String
+messageIcon = "messageIcon"
+
+messageReceivedIcon :: String
+messageReceivedIcon = "messageReceivedIcon"
+
+callMessageIcon :: String
+callMessageIcon = "callMessageIcon"
+
 -------------------ScreenNames----------------------
 
 ------- Driver Screen names -----

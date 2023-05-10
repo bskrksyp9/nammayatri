@@ -30,7 +30,6 @@ import PrestoDOM (Gravity(..), Length(..), Margin(..), Orientation(..), Padding(
 import PrestoDOM.Properties (cornerRadii)
 import PrestoDOM.Types.DomAttributes (Corners(..))
 import Styles.Colors as Color
-import Common.Types.App
 import Constant.Test as Id
 import EN
 

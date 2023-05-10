@@ -38,7 +38,9 @@ import Servant hiding (Summary)
 data RideEndpoint
   = RideStartEndpoint
   | RideEndEndpoint
+  | MultipleRideEndEndpoint
   | RideCancelEndpoint
+  | MultipleRideCancelEndpoint
   | RideSyncEndpoint
   deriving (Show, Read)
 
@@ -134,7 +136,28 @@ newtype EndRideReq = EndRideReq
 instance HideSecrets EndRideReq where
   hideSecrets = identity
 
----------------------------------------------------------
+--------------------------- MultipleRideEndAPI -----------------------------
+type MultipleRideEndAPI =
+  "end"
+    :> ReqBody '[JSON] MultipleRideEndReq
+    :> Post '[JSON] APISuccess
+
+newtype MultipleRideEndReq = MultipleRideEndReq
+  { rides :: [MultipleRideItem]
+  }
+  deriving stock (Show, Generic)
+  deriving anyclass (ToJSON, FromJSON, ToSchema)
+
+data MultipleRideItem = MultipleRideItem
+  { rideId :: Id Ride,
+    point :: Maybe LatLong
+  }
+  deriving stock (Show, Generic)
+  deriving anyclass (ToJSON, FromJSON, ToSchema)
+
+instance HideSecrets MultipleRideEndReq where
+  hideSecrets = identity
+
 -- ride cancel ------------------------------------------
 
 type RideCancelAPI =
@@ -151,6 +174,30 @@ data CancelRideReq = CancelRideReq
   deriving anyclass (ToJSON, FromJSON, ToSchema)
 
 instance HideSecrets CancelRideReq where
+  hideSecrets = identity
+
+-- Multipleride cancel ------------------------------------------
+
+type MultipleRideCancelAPI =
+  "cancel"
+    :> ReqBody '[JSON] MultipleRideCancelReq
+    :> Post '[JSON] APISuccess
+
+data MultipleRideCancelInfo = MultipleRideCancelInfo
+  { rideId :: Id Ride,
+    reasonCode :: CancellationReasonCode,
+    additionalInfo :: Maybe Text
+  }
+  deriving stock (Show, Generic)
+  deriving anyclass (ToJSON, FromJSON, ToSchema)
+
+newtype MultipleRideCancelReq = MultipleRideCancelReq
+  { multiRideCancelReason :: [MultipleRideCancelInfo]
+  }
+  deriving stock (Show, Generic)
+  deriving anyclass (ToJSON, FromJSON, ToSchema)
+
+instance HideSecrets MultipleRideCancelReq where
   hideSecrets = identity
 
 ---------------------------------------------------------

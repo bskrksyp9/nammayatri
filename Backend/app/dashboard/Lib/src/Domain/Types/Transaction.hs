@@ -14,6 +14,8 @@
 
 module Domain.Types.Transaction where
 
+import qualified "rider-app" API.Dashboard.MultipleRideCancel as BAP
+import qualified "rider-app" API.Dashboard.MultipleRideEnd as BAP
 import qualified "rider-app" API.Dashboard.RideBooking.Booking as BAP
 import qualified "rider-app" API.Dashboard.RideBooking.Cancel as BAP
 import qualified "rider-app" API.Dashboard.RideBooking.Confirm as BAP
@@ -76,6 +78,8 @@ data Endpoint
   | ProfileAPI BAP.ProfileEndPoint
   | MapsAPI BAP.MapEndPoints
   | FlowStatusAPI BAP.RideNotifyEventEndPoint
+  | MultipleRideCancelAPI BAP.MultipleRideCancelEndpoint
+  | MultipleRideEndAPI BAP.MultipleRideEndEndpoint
   | CancelAPI BAP.RideCancelEndPoint
   | SpecialZoneAPI Common.SpecialZoneEndpoint
   deriving (Show, Read)

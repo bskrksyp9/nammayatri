@@ -37,7 +37,9 @@ type API =
     :> ( Common.RideListAPI
            :<|> Common.RideStartAPI
            :<|> Common.RideEndAPI
+           :<|> Common.MultipleRideEndAPI
            :<|> Common.RideCancelAPI
+           :<|> Common.MultipleRideCancelAPI
            :<|> Common.RideInfoAPI
            :<|> Common.RideSyncAPI
            :<|> Common.RideRouteAPI
@@ -48,7 +50,9 @@ handler merchantId =
   rideList merchantId
     :<|> rideStart merchantId
     :<|> rideEnd merchantId
+    :<|> multipleRideEnd merchantId
     :<|> rideCancel merchantId
+    :<|> multipleRideCancel merchantId
     :<|> rideInfo merchantId
     :<|> rideSync merchantId
     :<|> rideRoute merchantId
@@ -84,6 +88,11 @@ rideEnd merchantShortId reqRideId Common.EndRideReq {point} = withFlowHandlerAPI
   shandle <- EHandler.buildEndRideHandle merchantId
   EHandler.dashboardEndRide shandle rideId dashboardReq
 
+multipleRideEnd :: ShortId DM.Merchant -> Common.MultipleRideEndReq -> FlowHandler APISuccess
+multipleRideEnd merchantShortId Common.MultipleRideEndReq {rides} = do
+  mapM_ (\rideItem -> rideEnd merchantShortId rideItem.rideId Common.EndRideReq {point = rideItem.point}) rides
+  return Success
+
 rideCancel :: ShortId DM.Merchant -> Id Common.Ride -> Common.CancelRideReq -> FlowHandler APISuccess
 rideCancel merchantShortId reqRideId Common.CancelRideReq {reasonCode, additionalInfo} = withFlowHandlerAPI $ do
   merchant <- findMerchantByShortId merchantShortId
@@ -94,6 +103,11 @@ rideCancel merchantShortId reqRideId Common.CancelRideReq {reasonCode, additiona
             additionalInfo
           }
   CHandler.dashboardCancelRideHandler CHandler.cancelRideHandle merchant.id rideId dashboardReq
+
+multipleRideCancel :: ShortId DM.Merchant -> Common.MultipleRideCancelReq -> FlowHandler APISuccess
+multipleRideCancel merchantShortId req = do
+  mapM_ (\info -> rideCancel merchantShortId info.rideId Common.CancelRideReq {reasonCode = info.reasonCode, additionalInfo = info.additionalInfo}) req.multiRideCancelReason
+  return Success
 
 rideInfo :: ShortId DM.Merchant -> Id Common.Ride -> FlowHandler Common.RideInfoRes
 rideInfo merchantShortId = withFlowHandlerAPI . DRide.rideInfo merchantShortId

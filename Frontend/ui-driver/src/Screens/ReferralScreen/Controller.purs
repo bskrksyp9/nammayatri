@@ -15,8 +15,8 @@
 
 module Screens.ReferralScreen.Controller where
 
-import Prelude (bind , class Show, pure, unit, ($), discard , (>=) , (<=) ,(==),(&&) , not ,(+) , show , void, (<>), when)
-import Screens.Types (ReferralScreenState, ReferralType(..), LeaderBoardType(..), DateSelector(..))
+import Prelude (bind , class Show, pure, unit, ($), discard , (>=) , (<=) ,(==),(&&) , not ,(+) , show , void, (<>), when, map)
+import Screens.Types (ReferralScreenState, ReferralType(..), LeaderBoardType(..), DateSelector(..), RankCardData)
 import Components.BottomNavBar as BottomNavBar
 import Components.GenericHeader as GenericHeader
 import Components.PrimaryEditText.Controllers as PrimaryEditText
@@ -36,6 +36,7 @@ import Storage (setValueToLocalNativeStore, KeyStore(..))
 import Engineering.Helpers.Commons (getNewIDWithTag)
 import Data.Array (last, (!!))
 import Data.Maybe (Maybe(..))
+import Services.APITypes (LeaderBoardRes(..), DriversInfo(..))
 
 
 instance showAction :: Show Action where
@@ -103,6 +104,7 @@ instance loggableAction :: Loggable Action where
       case date of
         DaySelector _ -> trackAppScreenEvent appId (getScreen REFERRAL_SCREEN) "in_screen" "day_changed"
         WeekSelector _ -> trackAppScreenEvent appId (getScreen REFERRAL_SCREEN) "in_screen" "week_changed"
+    UpdateLeaderBoard _ -> trackAppScreenEvent appId (getScreen REFERRAL_SCREEN) "in_screen" "update_leaderBoard"
 
 data Action = BottomNavBarAction BottomNavBar.Action
             | GenericHeaderActionController GenericHeader.Action
@@ -121,6 +123,7 @@ data Action = BottomNavBarAction BottomNavBar.Action
             | ChangeLeaderBoardtab LeaderBoardType
             | DateSelectorAction
             | ChangeDate DateSelector
+            | UpdateLeaderBoard LeaderBoardRes
 
 data ScreenOutput = GoToHomeScreen
                   | GoBack
@@ -129,6 +132,10 @@ data ScreenOutput = GoToHomeScreen
                   | GoToNotifications
                   | LinkReferralApi ReferralScreenState
 eval :: Action -> ReferralScreenState -> Eval Action ScreenOutput ReferralScreenState
+
+eval (UpdateLeaderBoard leaderBoardRes) state = do
+  let rankersData = transformLeaderBoardList leaderBoardRes
+  continue state{ props { rankersData = rankersData } }
 
 eval AfterRender state = do
   let pastDates = getPastDays 7
@@ -222,3 +229,15 @@ eval (BottomNavBarAction (BottomNavBar.OnNavigate item)) state = do
     _ -> continue state
 
 eval _ state = continue state
+
+
+transformLeaderBoardList :: LeaderBoardRes -> Array RankCardData
+transformLeaderBoardList (LeaderBoardRes leaderBoardList) = map (\x -> transformLeaderBoard x) leaderBoardList.driverList
+
+transformLeaderBoard :: DriversInfo -> RankCardData
+transformLeaderBoard (DriversInfo driversInfo) = {
+    goodName : driversInfo.name
+  , profileUrl : Nothing
+  , rank : driversInfo.rank
+  , rides : driversInfo.totalRides
+}

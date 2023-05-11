@@ -97,6 +97,8 @@ foreign import getImageUrl :: String -> String
 
 -- -- ####### MAP FFI ######## -----
 foreign import currentPosition  :: String -> Effect Unit
+foreign import getPastDays :: Int -> Array LeaderBoardDay
+foreign import getPastWeeks :: Int -> Array LeaderBoardWeek
 
 otpRule :: Reader.OtpRule
 otpRule = Reader.OtpRule {

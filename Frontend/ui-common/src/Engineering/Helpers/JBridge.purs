@@ -144,7 +144,7 @@ foreign import startChatListenerService :: Effect Unit
 foreign import stopChatListenerService :: Effect Unit
 foreign import storeCallBackMessageUpdated :: forall action. (action -> Effect Unit) -> String -> String  -> (String -> String -> String -> action) -> Effect Unit
 foreign import sendMessage :: String -> Unit
-foreign import scrollToBottom :: String -> Effect Unit
+foreign import scrollToEnd :: String -> Boolean -> Effect Unit
 foreign import metaLogEvent :: String -> Unit
 foreign import firebaseLogEvent :: String -> Unit
 foreign import firebaseLogEventWithParams :: String -> String -> String -> Effect Unit

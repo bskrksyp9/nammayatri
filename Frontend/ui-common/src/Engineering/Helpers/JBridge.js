@@ -598,9 +598,11 @@ export const sendMessage = function (message) {
   }
 };
 
-export const scrollToBottom = function(id) {
-  if (JBridge.scrollToBottom){
-    JBridge.scrollToBottom(id)
+export const scrollToEnd = function (id) {
+  return function (bottom) {
+    if (JBridge.scrollToEnd) {
+      JBridge.scrollToEnd(id, bottom)
+    }
   }
 }
 

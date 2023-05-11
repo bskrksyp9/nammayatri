@@ -535,3 +535,44 @@ export const getImageUrl = function (url) {
     console.log("error in getImageUrl " + e);
   }
 };
+
+export const getPastDays = function (count) {
+  try {
+    let result = [];
+    for (var i = 0; i < count; i++) {
+      let d = new Date();
+      d.setDate(d.getDate() - i);
+      let obj = {}
+      obj.date = d.getDate()
+      obj.month = d.toLocaleString('default', { month: 'short' })
+      obj.year = d.getFullYear();
+      result.push(obj)
+    }
+    console.log(result);
+    return result.reverse();
+  } catch (e) {
+    console.log("error in getPastDays", e);
+  }
+};
+
+export const getPastWeeks = function (count) {
+  try {
+    let result = []
+    for (var i = 0; i < count; i++) {
+      let dStart = new Date();
+      let dEnd = new Date();
+      dStart.setDate(dStart.getDate() - 7 * (i + 1));
+      dEnd.setDate(dEnd.getDate() - 7 * i);
+      let obj = {}
+      obj.startDate = dStart.getDate()
+      obj.endDate = dEnd.getDate()
+      obj.startMonth = dStart.toLocaleString('default', { month: 'short' })
+      obj.endMonth = dEnd.toLocaleString('default', { month: 'short' })
+      result.push(obj)
+    }
+    console.log(result);
+    return result.reverse();
+  } catch (e) {
+    console.log("error in getPastWeeks", e);
+  }
+};

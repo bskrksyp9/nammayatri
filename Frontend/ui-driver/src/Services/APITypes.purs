@@ -1332,3 +1332,42 @@ instance standardEncodeRemoveAlternateNumberRequest :: StandardEncode RemoveAlte
 instance encodeRemoveAlternateNumberRequest :: Encode RemoveAlternateNumberRequest where encode = defaultEncode
 
 
+------------------------------------------------------ leaderBoard -----------------------------------------------
+
+data LeaderBoardReq = LeaderBoardReq String
+
+newtype LeaderBoardRes = LeaderBoardRes {
+  driverList :: Array DriversInfo
+}
+
+newtype DriversInfo = DriversInfo
+  { name :: String
+  , totalRides :: Int
+  , rank :: Int
+  , totalDistance :: Int
+  }
+
+instance makeLeaderBoardReq :: RestEndpoint LeaderBoardReq LeaderBoardRes where
+    makeRequest reqBody@(LeaderBoardReq limit) headers = defaultMakeRequest GET (EP.leaderBoard limit) headers reqBody
+    decodeResponse = decodeJSON
+    encodeRequest req = defaultEncode req
+
+derive instance genericLeaderBoardReq :: Generic LeaderBoardReq _
+instance showLeaderBoardReq :: Show LeaderBoardReq where show = genericShow
+instance standardEncodeLeaderBoardReq :: StandardEncode LeaderBoardReq where standardEncode (LeaderBoardReq _) = standardEncode {}
+instance decodeLeaderBoardReq :: Decode LeaderBoardReq where decode = defaultDecode
+instance encodeLeaderBoardReq :: Encode LeaderBoardReq where encode = defaultEncode
+
+derive instance genericLeaderBoardRes :: Generic LeaderBoardRes _
+derive instance newtypeLeaderBoardRes :: Newtype LeaderBoardRes _
+instance showLeaderBoardRes :: Show LeaderBoardRes where show = genericShow
+instance standardEncodeLeaderBoardRes :: StandardEncode LeaderBoardRes where standardEncode (LeaderBoardRes res) = standardEncode res
+instance decodeLeaderBoardRes :: Decode LeaderBoardRes where decode = defaultDecode
+instance encodeLeaderBoardRes :: Encode LeaderBoardRes where encode = defaultEncode
+
+derive instance genericDriversInfo :: Generic DriversInfo _
+derive instance newtypeDriversInfo :: Newtype DriversInfo _
+instance showDriversInfo :: Show DriversInfo where show = genericShow
+instance standardEncodeDriversInfo :: StandardEncode DriversInfo where standardEncode (DriversInfo res) = standardEncode res
+instance decodeDriversInfo :: Decode DriversInfo where decode = defaultDecode
+instance encodeDriversInfo :: Encode DriversInfo where encode = defaultEncode

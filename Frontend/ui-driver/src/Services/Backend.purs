@@ -700,6 +700,11 @@ removeAlternateNumber payload = do
    where
         unwrapResponse (x) = x
 
-
-
-
+--------------------------------- leaderBoard  --------------------------------------------------------------------------------------------------------
+leaderBoardBT :: String -> FlowBT String LeaderBoardRes
+leaderBoardBT limit = do
+        headers <- lift $ lift $ getHeaders ""
+        withAPIResultBT (EP.leaderBoard limit) (\x → x) errorHandler (lift $ lift $ callAPI headers (LeaderBoardReq limit))
+    where
+    errorHandler (ErrorPayload errorPayload) =  do
+        BackT $ pure GoBack

@@ -30,7 +30,7 @@ import JBridge (openUrlInApp , startTimerWithTime , toast)
 import Language.Strings (getString)
 import Language.Types (STR(..))
 import Prelude (Unit, bind, const, pure, unit, ($), (<<<), (==), (<>) , map , discard , show ,(>), void, (/=), (/), (*), (+), not, (||), negate, (<=))
-import PrestoDOM (Gravity(..), Length(..), LetterSpacing(..), Margin(..), Orientation(..), Padding(..), PrestoDOM, Screen, Visibility(..), background, color, fontStyle, gravity, height, lineHeight, linearLayout, margin, onBackPressed, orientation, padding, text, textSize, textView, weight, width, imageView, imageUrl, cornerRadius, onClick, afterRender, visibility,stroke , alpha, relativeLayout , scrollView , alignParentRight, alignParentBottom, imageWithFallback, frameLayout, horizontalScrollView, scrollBarX, scrollBarY, id, gradient, rotation, rotationY)
+import PrestoDOM (Gravity(..), Length(..), LetterSpacing(..), Margin(..), Orientation(..), Padding(..), PrestoDOM, Screen, Visibility(..), Gradient(..), background, color, fontStyle, gravity, height, lineHeight, linearLayout, margin, onBackPressed, orientation, padding, text, textSize, textView, weight, width, imageView, imageUrl, cornerRadius, onClick, afterRender, visibility,stroke , alpha, relativeLayout , scrollView , alignParentRight, alignParentBottom, imageWithFallback, frameLayout, horizontalScrollView, scrollBarX, scrollBarY, id, gradient, rotation, rotationY, shimmerFrameLayout)
 import PrestoDOM.Types.DomAttributes (Corners(..))
 import PrestoDOM.Properties (cornerRadii)
 import Screens.ReferralScreen.Controller (Action(..), ScreenOutput, eval)
@@ -52,13 +52,24 @@ import Data.Array (mapWithIndex, (!!), length, null, index, drop)
 import Data.Int (toNumber, ceil)
 import Styles.Types as Font
 import PrestoDOM.Animation as PrestoAnim
+import Debug (spy)
+import Services.Backend as Remote
 
 screen :: ST.ReferralScreenState -> Screen Action ST.ReferralScreenState ScreenOutput
 screen initialState =
   { initialState
   , view
   , name : "ReferralScreen"
-  , globalEvents : []
+  , globalEvents : [
+              (\push -> do
+                void $ launchAff $ flowRunner $ runExceptT $ runBackT $ do
+                  leaderBoardRes <- Remote.leaderBoardBT "10"
+                  lift $ lift $ doAff do liftEffect $ push $ UpdateLeaderBoard leaderBoardRes
+                  _ <- pure $ spy "leaderBoard responses" leaderBoardRes
+                  pure unit
+                pure (pure unit)
+              )
+  ]
   , eval
   }
 

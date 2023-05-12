@@ -272,11 +272,11 @@ callSuccessfulConfig state  =
     , margin = (Margin 40 23 40 46)
     , fontStyle = FontStyle.semiBold LanguageStyle }
     , option1 {
-      text = "No"
+      text = (getString NO)
     , fontSize = FontSize.a_16
     , margin = (MarginHorizontal 16 16) }
     , option2 {
-      text = "Yes"
+      text = (getString YES)
     , fontSize = FontSize.a_16
     , margin = (MarginHorizontal 12 0) }
     , backgroundClickable = true

@@ -1504,7 +1504,7 @@ instance encodeServiceabilityRes :: Encode ServiceabilityRes where encode = defa
 
 ----------------------------------------------------------------------- flowStatus api -------------------------------------------------------------------
 
-data FlowStatusReq = FlowStatusReq
+data FlowStatusReq = FlowStatusReq String
 
 newtype FlowStatusRes = FlowStatusRes
   { currentStatus :: FlowStatus
@@ -1519,14 +1519,16 @@ data FlowStatus = IDLE {}
                 | WAITING_FOR_DRIVER_ASSIGNMENT { bookingId :: String , validTill :: String }
                 | RIDE_ASSIGNED { rideId :: String }
                 | PENDING_RATING { rideId :: String }
+                | RIDE_STARTED { rideId :: String, driverLocation :: LatLong, bookingId :: String }
+                | RIDE_PICKUP { rideId :: String, driverLocation :: LatLong, bookingId :: String, otp :: String, trackingUrl :: String}
 
 instance makeFlowStatusReq :: RestEndpoint FlowStatusReq FlowStatusRes where
-    makeRequest reqBody headers = defaultMakeRequest GET (EP.flowStatus "") headers reqBody
+    makeRequest reqBody@(FlowStatusReq isPolling) headers = defaultMakeRequest GET (EP.flowStatus isPolling) headers reqBody
     decodeResponse = decodeJSON
     encodeRequest req = defaultEncode req
 
 derive instance genericFlowStatusReq :: Generic FlowStatusReq _
-instance standardEncodeFlowStatusReq :: StandardEncode FlowStatusReq where standardEncode (FlowStatusReq) = standardEncode {}
+instance standardEncodeFlowStatusReq :: StandardEncode FlowStatusReq where standardEncode (FlowStatusReq isPolling) = standardEncode {}
 instance decodeFlowStatusReq :: Decode FlowStatusReq where decode = defaultDecode
 instance encodeFlowStatusReq :: Encode FlowStatusReq where encode = defaultEncode
 
@@ -1551,6 +1553,8 @@ instance decodeFlowStatus :: Decode FlowStatus
                                       "WAITING_FOR_DRIVER_ASSIGNMENT" -> (WAITING_FOR_DRIVER_ASSIGNMENT <$> decode body)
                                       "RIDE_ASSIGNED"                 -> (RIDE_ASSIGNED <$> decode body)
                                       "PENDING_RATING"                -> (PENDING_RATING <$> decode body)
+                                      "RIDE_STARTED"                 -> (RIDE_STARTED <$> decode body)
+                                      "RIDE_PICKUP"                   -> (RIDE_PICKUP <$> decode body)
                                       _                               -> (fail $ ForeignError "Unknown response")
                     Left err     -> (fail $ ForeignError "Unknown response")
 instance encodeFlowStatus :: Encode FlowStatus
@@ -1563,6 +1567,8 @@ instance encodeFlowStatus :: Encode FlowStatus
     encode (WAITING_FOR_DRIVER_ASSIGNMENT body) = encode body
     encode (RIDE_ASSIGNED body) = encode body
     encode (PENDING_RATING body) = encode body
+    encode (RIDE_STARTED body) = encode body
+    encode (RIDE_PICKUP body) = encode body
 instance standardEncodeFlowStatus :: StandardEncode FlowStatus
   where
     standardEncode (IDLE body) = standardEncode body
@@ -1573,6 +1579,8 @@ instance standardEncodeFlowStatus :: StandardEncode FlowStatus
     standardEncode (WAITING_FOR_DRIVER_ASSIGNMENT body) = standardEncode body
     standardEncode (RIDE_ASSIGNED body) = standardEncode body
     standardEncode (PENDING_RATING body) = standardEncode body
+    standardEncode (RIDE_STARTED body) = standardEncode body
+    standardEncode (RIDE_PICKUP body) = standardEncode body
 
 ----------------------------------------------------------------------- notifyFlowEvent api -------------------------------------------------------------------
 

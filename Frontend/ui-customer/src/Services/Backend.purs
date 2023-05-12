@@ -731,10 +731,16 @@ makeServiceabilityReq latitude longitude = ServiceabilityReq {
 flowStatusBT :: String -> FlowBT String FlowStatusRes
 flowStatusBT dummy = do
         headers <- getHeaders' ""
-        withAPIResultBT (EP.flowStatus "") (\x → x) errorHandler (lift $ lift $ callAPI headers FlowStatusReq)
+        withAPIResultBT (EP.flowStatus dummy) (\x → x) errorHandler (lift $ lift $ callAPI headers (FlowStatusReq dummy))
     where
         errorHandler errorPayload = do
             BackT $ pure GoBack
+
+flowStatus val= do
+        headers <- getHeaders ""
+        withAPIResult (EP.flowStatus val) unwrapResponse $ callAPI headers (FlowStatusReq val)
+    where
+        unwrapResponse (x) = x
 
 ---------------------------------------------------------------- notifyFlowEvent function -------------------------------------------------------------------
 

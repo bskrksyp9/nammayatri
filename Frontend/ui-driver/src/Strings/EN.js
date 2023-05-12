@@ -336,7 +336,7 @@ const englishStrings = {
   REFERRAL_CODE_LINKING: "Referral Code Linking",
   CONTACT_SUPPORT: "Contact Support",
   CALL_SUPPORT: "Call Support",
-  YOU_ARE_ABOUT_TO_CALL_NAMMA_YATRI_SUPPORT: "You are about to place a call to the Namma Yatri Support Team. Do you want to proceed?",
+  YOU_ARE_ABOUT_TO_CALL_NAMMA_YATRI_SUPPORT: "You are about to place a call to the Support Team. Do you want to proceed?",
   REFERRAL_ENROLMENT: "Referral Enrolment",
   REFERRALS: "Referrals",
   LINK_REFERRAL_CODE: "Link Referral Code",

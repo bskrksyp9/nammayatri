@@ -268,7 +268,7 @@ callSuccessfulConfig state  =
   config' = PopUpModalConfig.config 
   popUpConfig' = config' {
     primaryText { 
-      text = (<>) "Was Your Call Successful" "?"
+      text = (<>) (getString WAS_YOUR_CALL_SUCCESSFUL) "?"
     , margin = (Margin 40 23 40 46)
     , fontStyle = FontStyle.semiBold LanguageStyle }
     , option1 {

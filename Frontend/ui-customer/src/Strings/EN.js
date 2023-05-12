@@ -437,5 +437,7 @@ const englishStrings = {
   "ANONYMOUS_CALL" : "Anonymous Call",
   "YOUR_NUMBER_WILL_NOT_BE_SHOWN_TO_THE_DRIVER" : "Your number will not be shown to the driver",
   "YOUR_NUMBER_WILL_BE_VISIBLE_TO_THE_DRIVER_USE_IF_NOT_CALLING_FROM_REGISTERED_NUMBER" : "Your number will be visible to the driver. Use if not calling from registered number",
-  "CALL_DRIVER_USING" : "Call Driver using:"
+  "CALL_DRIVER_USING" : "Call Driver using:",
+  "WAS_YOUR_CALL_SUCCESSFUL" : "Was Your Call Successful"
+  
 }

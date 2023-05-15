@@ -100,7 +100,7 @@ getLatestAndroidVersion :: Merchant -> Int
 getLatestAndroidVersion merchant = 
   case merchant of 
     NAMMAYATRIPARTNER -> 54
-    YATRIPARTNER -> 43 
+    YATRIPARTNER -> 48 
     JATRISAATHIDRIVER -> 2
 
 checkVersionForChat :: Int -> Boolean

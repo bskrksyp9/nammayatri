@@ -145,7 +145,7 @@ getLatestAndroidVersion :: Merchant -> Int
 getLatestAndroidVersion merchant = 
   case merchant of 
     NAMMAYATRI -> 31 
-    YATRI -> 45
+    YATRI -> 49
     JATRISAATHI -> 2
 
 forceIOSupdate :: Int -> Int -> Int -> Boolean
